@@ -31,12 +31,13 @@ const defaultOptions = {
 };
 
 export interface CodeMirrorProps {
-  code?: string;
+  code: string;
   onFocus?: () => void;
   onBlur?: () => void;
   onAltEnter?: () => void;
   onShiftEnter?: () => void;
   onCtrlEnter?: () => void;
+  onChange?: (code: string) => void;
 }
 export interface CodeMirrorState { }
 
@@ -109,6 +110,10 @@ export class CodeMirrorComponent extends
 
     this.editor.on("blur", () => {
       if (this.props.onBlur) this.props.onBlur();
+    });
+
+    this.editor.on("change", () => {
+      if (this.props.onChange) this.props.onChange(this.code);
     });
   }
 
