@@ -18,46 +18,29 @@
 // re-rendered client-side. The Propel code in the cells are executed
 // server-side so the results can be displayed even if javascript is disabled.
 
-import { escape } from "he";
 import { Component, h } from "preact";
-import { OutputHandlerDOM } from "../src/output_handler";
-import {
-  assert,
-  delay,
-  randomString,
-  URL
-} from "../src/util";
-import { CodeMirrorComponent } from "./codemirror";
 import {
   Avatar,
   GlobalHeader,
   Loading,
   normalizeCode,
   UserMenu,
+  docTitle,
+  UserTitle,
+  profileLink
 } from "./common";
+import { Notebook } from "./notebook";
+import { drainExecuteQueue } from "./cell";
 import * as db from "./db";
-import { RPC, WindowRPC } from "./rpc";
-
-const cellTable = new Map<number, Cell>(); // Maps id to Cell.
-let nextCellId = 1;
 
 export function resetNotebook() {
-  destroySandbox();
-  cellTable.clear();
-  nextCellId = 1;
-}
-
-const prerenderedOutputs = new Map<number, string>();
-
-export function registerPrerenderedOutput(output) {
-  const cellId = Number(output.id.replace("output", ""));
-  prerenderedOutputs.set(cellId, output.innerHTML);
+  // TODO
 }
 
 // An anonymous notebook doc for when users aren't logged in
 const anonDoc = {
   anonymous: true,
-  cells: ["// New Notebook. Insert code here."],
+  cells: [],
   created: new Date(),
   owner: {
     displayName: "Anonymous",
@@ -68,296 +51,6 @@ const anonDoc = {
   updated: new Date(),
 };
 
-// Given a cell's id, which can either be an integer or
-// a string of the form "cell5" (where 5 is the id), look up
-// the component in the global table.
-export function lookupCell(id: string | number): Cell {
-  let numId;
-  if (typeof id === "string") {
-    numId = Number(id.replace("cell", ""));
-  } else {
-    numId = id;
-  }
-  return cellTable.get(numId);
-}
-
-export function lookupOutputHandler(id: string | number) {
-  const cell = lookupCell(id);
-  return cell.getOutputHandler();
-}
-
-const rpcHandlers = {
-  plot(cellId: number, data: any): any {
-    lookupOutputHandler(cellId).plot(data);
-  },
-
-  print(cellId: number, data: any): any {
-    return lookupOutputHandler(cellId).print(data);
-  },
-
-  imshow(cellId: number, data: any): any {
-    return lookupOutputHandler(cellId).imshow(data);
-  },
-
-  downloadProgress(cellId: number, data: any): void {
-    return lookupOutputHandler(cellId).downloadProgress(data);
-  }
-};
-
-function createIframe(rpcChannelId): HTMLIFrameElement {
-  const base = new URL("/sandbox", window.document.baseURI).href;
-  const html = `<!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="utf-8"/>
-        <meta name="rpc-channel-id" content="${escape(rpcChannelId)}"/>
-        <base href="${escape(base)}">
-        <script async type="text/javascript" src="/sandbox.js">
-        </script>
-      </head>
-      <body>
-      </body>
-    </html>`;
-
-  const iframe = document.createElement("iframe");
-  iframe.setAttribute("sandbox", "allow-scripts");
-  iframe.setAttribute("srcdoc", `${html}`);
-  // Edge doesn't support "srcdoc", it'll use a data url instead.
-  iframe.setAttribute("src", `data:text/html,${html}`);
-  iframe.style.display = "none";
-  document.body.appendChild(iframe);
-
-  return iframe;
-}
-
-let sandboxIframe: HTMLIFrameElement = null;
-let sandboxRpc: RPC = null;
-
-function createSandbox(): void {
-  const rpcChannelId = randomString();
-  sandboxIframe = createIframe(rpcChannelId);
-  sandboxRpc = new WindowRPC(sandboxIframe.contentWindow, rpcChannelId);
-  sandboxRpc.start(rpcHandlers);
-}
-
-function destroySandbox(): void {
-  if (!sandboxRpc) return;
-
-  sandboxRpc.stop();
-  if (sandboxIframe.parentNode) {
-    sandboxIframe.parentNode.removeChild(sandboxIframe);
-  }
-  sandboxRpc = null;
-  sandboxIframe = null;
-}
-
-export function sandbox(): RPC {
-  if (sandboxRpc === null) {
-    createSandbox();
-  }
-  return sandboxRpc;
-}
-
-// Convenience function to create Notebook JSX element.
-export function cell(code: string, props: CellProps = {}): JSX.Element {
-  props.code = code.trim();
-  return <Cell { ...props } />;
-}
-
-// When rendering HTML server-side, all of the notebook cells are executed so
-// their output can be placed in the generated HTML. This queue tracks the
-// execution promises for each cell.
-const cellExecuteQueue: Cell[] = [];
-
-export async function drainExecuteQueue() {
-  while (cellExecuteQueue.length > 0) {
-    const cell = cellExecuteQueue.shift();
-    await cell.run();
-  }
-}
-
-export interface CellProps {
-  code?: string;
-  onRun?: (code: null | string) => void;
-  // If onDelete or onInsertCell is null, it hides the button.
-  onDelete?: () => void;
-  onInsertCell?: () => void;
-}
-export interface CellState { }
-
-export class Cell extends Component<CellProps, CellState> {
-  parentDiv: Element;
-  input: Element;
-  output: Element;
-  private outputHandler: OutputHandlerDOM;
-  cm: CodeMirrorComponent;
-  readonly id: number;
-  outputHTML?: string;
-
-  constructor(props) {
-    super(props);
-    this.id = nextCellId++;
-    if (prerenderedOutputs.has(this.id)) {
-      this.outputHTML = prerenderedOutputs.get(this.id);
-    }
-    cellTable.set(this.id, this);
-  }
-
-  componentWillMount() {
-    if (this.outputHTML == null) {
-      cellExecuteQueue.push(this);
-    }
-  }
-
-  get code(): string {
-    return normalizeCode(this.cm ? this.cm.code : this.props.code);
-  }
-
-  getOutputHandler() {
-    if (!this.outputHandler) {
-      this.outputHandler = new OutputHandlerDOM(this.output);
-    }
-    return this.outputHandler;
-  }
-
-  downloadProgress(data) {
-    const o = new OutputHandlerDOM(this.output);
-    o.downloadProgress(data);
-  }
-
-  clearOutput() {
-    this.output.innerHTML = "";
-  }
-
-  focusNext() {
-    const cellsEl = this.parentDiv.parentElement;
-    // Don't focus next if we're in the docs.
-    if (cellsEl.className !== "cells") return;
-
-    const nbCells = cellsEl.getElementsByClassName("notebook-cell");
-    assert(nbCells.length > 0);
-
-    // NodeListOf<Element> doesn't have indexOf. We loop instead.
-    for (let i = 0; i < nbCells.length - 1; i++) {
-      if (nbCells[i] === this.parentDiv) {
-        const nextCellElement = nbCells[i + 1];
-        const next = lookupCell(nextCellElement.id);
-        assert(next != null);
-        next.focus();
-        return;
-      }
-    }
-  }
-
-  focus() {
-    this.cm.focus();
-    this.parentDiv.classList.add("notebook-cell-focus");
-    this.parentDiv.scrollIntoView();
-  }
-
-  // This method executes the code in the cell, and updates the output div with
-  // the result. The onRun callback is called if provided.
-  async run() {
-    this.clearOutput();
-    const classList = (this.input.parentNode as HTMLElement).classList;
-    classList.add("notebook-cell-running");
-
-    await sandbox().call("runCell", this.code, this.id);
-
-    classList.add("notebook-cell-updating");
-    await delay(100);
-    classList.remove("notebook-cell-updating");
-    classList.remove("notebook-cell-running");
-
-    if (this.props.onRun) this.props.onRun(this.code);
-  }
-
-  clickedDelete() {
-    console.log("Delete was clicked.");
-    if (this.props.onDelete) this.props.onDelete();
-  }
-
-  clickedInsertCell() {
-    console.log("NewCell was clicked.");
-    if (this.props.onInsertCell) this.props.onInsertCell();
-  }
-
-  render() {
-    const runButton = (
-      <button class="run-button" onClick={ this.run.bind(this) } />
-    );
-
-    let deleteButton = null;
-    if (this.props.onDelete) {
-      deleteButton = (
-        <button
-          class="delete-button"
-          onClick={ this.clickedDelete.bind(this) } />
-      );
-    }
-
-    let insertButton = null;
-    if (this.props.onInsertCell) {
-      insertButton = (
-        <button
-          class="insert-button"
-          onClick={ this.clickedInsertCell.bind(this) } />
-      );
-    }
-
-    // If supplied outputHTML, use that in the output div.
-    const outputDivAttr = {
-      "class": "output",
-      "id": "output" + this.id,
-      "ref": (ref => { this.output = ref; }),
-    };
-    if (this.outputHTML) {
-      outputDivAttr["dangerouslySetInnerHTML"] = {
-        __html: this.outputHTML,
-      };
-    }
-    const outputDiv = <div { ...outputDivAttr } />;
-
-    const runCellAndFocusNext = () => {
-      this.run();
-      this.cm.blur();
-      this.focusNext();
-    };
-
-    return (
-      <div
-        class="notebook-cell"
-        id={ `cell${this.id}` }
-        ref={ ref => { this.parentDiv = ref; } } >
-        <div
-          class="input"
-          ref={ ref => { this.input = ref; } } >
-          <CodeMirrorComponent
-            code={ this.code }
-            ref={ ref => { this.cm = ref; } }
-            onFocus={ () => {
-              this.parentDiv.classList.add("notebook-cell-focus");
-            } }
-            onBlur={ () => {
-              this.parentDiv.classList.remove("notebook-cell-focus");
-            } }
-            onAltEnter={ runCellAndFocusNext }
-            onShiftEnter={ runCellAndFocusNext }
-            onCtrlEnter={ () => { this.run(); } }
-          />
-          { deleteButton }
-          { runButton }
-        </div>
-        <div class="progress-bar" />
-        <div class="output-container">
-          { outputDiv }
-          { insertButton }
-        </div>
-      </div>
-    );
-  }
-}
-
 export interface FixedProps {
   code: string;
 }
@@ -365,7 +58,7 @@ export interface FixedProps {
 // FixedCell is for non-executing notebook-lookalikes. Usually will be used for
 // non-javascript code samples.
 // TODO share more code with Cell.
-export class FixedCell extends Component<FixedProps, CellState> {
+export class FixedCell extends Component<FixedProps, {}> {
   render() {
     // Render as a pre in case people don't have javascript turned on.
     return (
@@ -408,6 +101,7 @@ export interface NotebookRootState {
 export class NotebookRoot extends Component<NotebookRootProps,
                                             NotebookRootState> {
   notebookRef?: Notebook; // Hook for testing.
+  isCloningInProgress: boolean;
 
   constructor(props) {
     super(props);
@@ -466,6 +160,26 @@ export class NotebookRoot extends Component<NotebookRootProps,
     }
   }
 
+  async handleNotebookSave(doc: db.NotebookDoc) {
+    this.setState({ doc });
+    if (doc.anonymous) return;
+    if (this.props.userInfo.uid !== doc.owner.uid) return;
+    try {
+      await db.active.updateDoc(this.state.nbId, doc);
+    } catch (e) {
+      // TODO
+      console.log(e);
+    }
+  }
+
+  async handleNotebookClone() {
+    if (this.isCloningInProgress) return;
+    this.isCloningInProgress = true;
+    const cloneId = await db.active.clone(this.state.doc);
+    // Redirect to new notebook.
+    window.location.href = nbUrl(cloneId);
+  }
+
   render() {
     let body;
     if (this.state.errorMsg) {
@@ -487,9 +201,11 @@ export class NotebookRoot extends Component<NotebookRootProps,
     } else if (this.state.doc) {
       body = (
         <Notebook
-          nbInfo={ { nbId: this.state.nbId, doc: this.state.doc } }
-          ref= { ref => this.notebookRef = ref }
-          userInfo= { this.props.userInfo } />
+          save={ this.handleNotebookSave.bind(this) }
+          clone={ this.handleNotebookClone.bind(this) }
+          initialDoc={ this.state.doc }
+          ref={ ref => this.notebookRef = ref }
+          userInfo={ this.props.userInfo } />
       );
     } else if (this.state.mostRecent) {
       body = (
@@ -601,180 +317,6 @@ export class Profile extends Component<ProfileProps, ProfileState> {
   }
 }
 
-export interface NotebookProps {
-  nbInfo: db.NbInfo;
-  userInfo?: db.UserInfo;  // Info about the currently logged in user.
-}
-
-export interface NotebookState {
-  doc: db.NotebookDoc;
-  isCloningInProgress: boolean;
-  editingTitle: boolean;
-}
-
-// This defines the Notebook cells component.
-export class Notebook extends Component<NotebookProps, NotebookState> {
-  private titleInput: HTMLInputElement;
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      doc: this.props.nbInfo.doc,
-      isCloningInProgress: false,
-      editingTitle: false,
-    };
-  }
-
-  private async update(doc): Promise<void> {
-    this.setState({ doc });
-    if (doc.anonymous) return; // don't persist anonymous notebooks
-    try {
-      await db.active.updateDoc(this.props.nbInfo.nbId, doc);
-    } catch (e) {
-      // TODO updating the database should be moved out of Notebook because
-      // errors are handled in NotebookRoot. Clearly we need Redux or something
-      // similar.
-      // We should be doing this.setState({ errorMsg: e.message });
-      throw Error(e);
-    }
-  }
-
-  async onRun(updatedCode: string, i: number) {
-    const doc = this.state.doc;
-    updatedCode = normalizeCode(updatedCode);
-    // Save updated code in database if different.
-    if (normalizeCode(doc.cells[i]) !== updatedCode) {
-      doc.cells[i] = updatedCode;
-      this.update(doc);
-    }
-  }
-
-  async onSaveTitle(doc) {
-    this.setState({ editingTitle: false });
-    doc.title = this.titleInput.value;
-    this.update(doc);
-  }
-
-  async onDelete(i) {
-    const doc = this.state.doc;
-    doc.cells.splice(i, 1);
-    this.update(doc);
-  }
-
-  async onInsertCell(i) {
-    const doc = this.state.doc;
-    doc.cells.splice(i + 1, 0, "");
-    this.update(doc);
-  }
-
-  async onClone() {
-    if (this.state.isCloningInProgress) {
-      return;
-    }
-    console.log("Click clone");
-    this.setState({ isCloningInProgress: true });
-    const clonedId = await db.active.clone(this.state.doc);
-    this.setState({ isCloningInProgress: false });
-    // Redirect to new cloned notebook.
-    window.location.href = nbUrl(clonedId);
-  }
-
-  renderCells(doc): JSX.Element {
-    const codes = db.getInputCodes(doc);
-    return (
-      <div class="cells">
-        {codes.map((code, i) => {
-          // Only display the delete button if there is more than one
-          // cell.
-          const onDelete = doc.cells.length > 1 ? () => this.onDelete(i)
-                                                : null;
-          return cell(code, {
-            onRun: (updatedCode) => this.onRun(updatedCode, i),
-            onDelete,
-            onInsertCell: () => this.onInsertCell(i),
-          });
-        })}
-      </div>
-    );
-  }
-
-  render() {
-    const doc = this.state.doc;
-
-    const titleEdit = (
-      <div class="title">
-        <input
-          class="title-input"
-          ref={ ref => { this.titleInput = ref as HTMLInputElement; } }
-          value={ doc.title } />
-        <button
-          class="save-title green-button"
-          onClick={ () => this.onSaveTitle(doc) } >
-          Save
-        </button>
-        <button
-          class="cancel-edit-title"
-          onClick={ () => this.setState({ editingTitle: false }) } >
-          Cancel
-        </button>
-      </div>
-    );
-
-    const editButton = (
-      <button
-        class="edit-title"
-        onClick={ () => this.setState({ editingTitle: true }) } >
-        Edit
-      </button>
-    );
-
-    const titleDisplay = (
-      <div class="title">
-        <h2
-          class={ doc.title && doc.title.length ? "" : "untitled" }
-          value={ doc.title } >
-          { docTitle(doc) }
-        </h2>
-        { db.ownsDoc(this.props.userInfo, doc) ? editButton : null }
-      </div>
-    );
-
-    const title = this.state.editingTitle ? titleEdit : titleDisplay;
-
-    const cloneButton = this.props.userInfo == null ? "" : (
-      <button
-        class="green-button"
-        onClick={ () => this.onClone() } >
-        Clone
-      </button>
-    );
-
-    return (
-      <div class="notebook-container">
-        <UserTitle userInfo={ doc.owner } />
-        <div class="notebook-header">
-          { title }
-          { cloneButton }
-        </div>
-        { this.renderCells(doc) }
-      </div>
-    );
-  }
-}
-
-function UserTitle(props) {
-  return (
-    <div class="most-recent-header-title">
-      <Avatar userInfo={ props.userInfo } />
-      <h2>{ profileLink(props.userInfo) }</h2>
-    </div>
-  );
-}
-
-function docTitle(doc: db.NotebookDoc): string {
-  return doc.title || "Untitled Notebook";
-}
-
 function notebookList(notebooks: db.NbInfo[], {
   showName = true,
   showTitle = false,
@@ -792,15 +334,6 @@ function notebookList(notebooks: db.NbInfo[], {
       </a>
     );
   });
-}
-
-function profileLink(u: db.UserInfo, text: string = null): JSX.Element {
-  const href = window.location.origin + "/notebook/?profile=" + u.uid;
-  return (
-    <a class="profile-link" href={ href } >
-      { text ? text : u.displayName }
-    </a>
-  );
 }
 
 function notebookBlurb(doc: db.NotebookDoc, {
@@ -834,7 +367,7 @@ function notebookBlurb(doc: db.NotebookDoc, {
     ]);
   }
   if (showTitle) {
-    body.push(<p class="blurb-title">{ docTitle(doc) }</p>);
+    body.push(<p class="blurb-title">{ docTitle(doc.title) }</p>);
   }
   return <div class="blurb">{ ...body }</div>;
 }
