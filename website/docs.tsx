@@ -15,7 +15,38 @@
 // tslint:disable:variable-name
 import { h } from "preact";
 import { GlobalHeader } from "./common";
-import * as nb from "./nb";
+import { VM, createRPCHandler } from "./vm";
+import { StandaloneCell } from "./cell";
+
+let nextCellId: number = 0;
+ 
+const prerenderedOutputs = new Map<number, string>();
+
+export function registerPrerenderedOutput(output) {
+  const cellId = Number(output.id.replace("output", ""));
+  prerenderedOutputs.set(cellId, output.innerHTML);
+}
+
+const cellLookupTable = new Map<number, StandaloneCell>();
+
+const outputHandlerLookUp = createRPCHandler((id: number) => 
+  cellLookupTable.get(id).outputHandler
+);
+const sandbox = new VM(outputHandlerLookUp);
+
+function cell(src) {
+  const id = nextCellId++;
+  const outputHTML = prerenderedOutputs.get(id);
+  return (
+    <StandaloneCell
+      code={ src }
+      vm={ sandbox }
+      id={ id }
+      outputHTML={ prerenderedOutputs.get(id) }
+      ref={ cell => cellLookupTable.set(id, cell) }
+      autoRun={ outputHTML === null } />
+  );
+}
 
 export interface DocEntry {
   kind: "class" | "method" | "property";
@@ -69,7 +100,7 @@ export function markupDocStr(docstr: string): JSX.Element {
         if (line == null || !isIndented(line)) {
           state = "normal";
           const src = buf.map(unindent).join("\n");
-          elements.push(nb.cell(src));
+          elements.push(cell(src));
           buf = [];
         }
         break;
