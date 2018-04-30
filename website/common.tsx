@@ -103,3 +103,25 @@ export function Avatar(props: { size?: number, userInfo: db.UserInfo }) {
 export function normalizeCode(code: string): string {
   return code.trimRight();
 }
+
+export function UserTitle(props) {
+  return (
+    <div class="most-recent-header-title">
+      <Avatar userInfo={ props.userInfo } />
+      <h2>{ profileLink(props.userInfo) }</h2>
+    </div>
+  );
+}
+
+export function docTitle(title: string): string {
+  return title && title.length > 0 ? title : "Untitled Notebook";
+}
+
+export function profileLink(u: db.UserInfo, text: string = null): JSX.Element {
+  const href = window.location.origin + "/notebook/?profile=" + u.uid;
+  return (
+    <a class="profile-link" href={ href } >
+      { text ? text : u.displayName }
+    </a>
+  );
+}
