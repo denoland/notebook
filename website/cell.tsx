@@ -15,9 +15,7 @@
 
 import { h, Component } from "preact";
 import { CodeMirrorComponent } from "./codemirror";
-import { VM, createRPCHandler } from "./vm";
 import { delay } from "../src/util";
-import { OutputHandlerDOM } from "../src/output_handler";
 
 const cellExecuteQueue: Cell[] = [];
 
@@ -31,16 +29,16 @@ export async function drainExecuteQueue() {
 export interface CellProps {
   onDelete?: () => void;
   onInsertCell?: () => void;
-  onRun?: () => void;
+  onRun?: (code: string) => void;
   onChange?: (code: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
-  id?: number | string;
   focusNext?: () => void;
 
+  id: number | string;
   code: string;
-  outputDiv: Element;
-  autoRun?: boolean;
+  outputDiv?: Element;
+  outputHTML?: string;
 }
 
 export interface CellState {
@@ -50,15 +48,20 @@ export interface CellState {
 
 export class Cell extends Component<CellProps, CellState> {
   cm: CodeMirrorComponent;
-  autoRun: boolean = true;
   parentDiv: Element;
+  outputDiv: Element;
   state = {
     updating: false,
     running: false
   }
 
+  get code(): string {
+    if (!this.cm) return this.props.code;
+    return this.cm.code;
+  }
+
   clickedRun() {
-    if (this.props.onRun) this.props.onRun();
+    if (this.props.onRun) this.props.onRun(this.code);
   }
 
   clickedDelete() {
@@ -87,12 +90,24 @@ export class Cell extends Component<CellProps, CellState> {
     this.parentDiv.classList.remove("notebook-cell-focus");
   }
 
+  clearOutput() {
+    console.log(this.outputDiv);
+    this.outputDiv.innerHTML = "";
+  }
+
   async run() {
+    // FIXME Using setState will cause component to rerender and 
+    // that's why editor cursor moves to the beginning of code
+    // after pressing ctrl+enter
+    this.clearOutput();
     this.setState({ running: true });
-    if (this.props.onRun) await this.props.onRun();
+    if (this.props.onRun) await this.props.onRun(this.code);
     this.setState({ updating: true });
     await delay(100);
-    this.setState({ updating: false, running: false });
+    this.setState({
+      updating: false,
+      running: false
+    }, this.focus.bind(this));
   }
 
   onChange(code: string) {
@@ -125,14 +140,21 @@ export class Cell extends Component<CellProps, CellState> {
   }
 
   constructor(props) {
-    super();
-    if (props.autoRun !== undefined) {
-      this.autoRun = props.autoRun;
+    super(props);
+    if (props.outputDiv) {
+      this.outputDiv = props.outputDiv;
+    } else {
+      this.outputDiv = document.createElement("div");
+      this.outputDiv.className = "output";
+      this.outputDiv.id = "output-" + props.id;
+    }
+    if (props.outputHTML) {
+      this.outputDiv.innerHTML = props.outputHTML;
     }
   }
 
   componentWillMount() {
-    if (this.autoRun) {
+    if (this.props.outputHTML !== null) {
       cellExecuteQueue.push(this);
     }
   }
@@ -160,7 +182,7 @@ export class Cell extends Component<CellProps, CellState> {
       );
     }
 
-    const { id, outputDiv, code } = this.props;
+    const { id, code } = this.props;
     const { updating, running } = this.state;
 
     const inputClass = [ "input" ];
@@ -189,113 +211,11 @@ export class Cell extends Component<CellProps, CellState> {
         </div>
         <div class="progress-bar" />
         <div class="output-container" ref={ (div: any) => {
-          if (div) div.prepend(outputDiv);
+          if (div) div.prepend(this.outputDiv);
         }}>
           { insertButton }
         </div>
       </div>
-    );
-  }
-}
-
-// All codes below are for doc's cell.
-interface SCellProps {
-  code: string;
-  id: string | number;
-  outputHTML?: string;
-  vm?: VM;
-  autoRun?: boolean;
-}
-
-interface SCellState {
-  code: string;
-  focused: boolean;
-}
-
-export class StandaloneCell extends Component<SCellProps, SCellState> {
-  readonly id: number;
-  outputDiv: Element;
-  outputHTML?: string;
-  outputHandler: OutputHandlerDOM;
-  vm: VM;
-  destroyVM: boolean;
-
-  constructor(props) {
-    super(props);
-    this.id = props.id;
-    this.outputHTML = props.outputHTML;
-    this.state = {
-      code: props.code,
-      focused: false
-    };
-    if (this.props.vm) this.vm = this.props.vm;
-  }
-
-  componentWillUnmount() {
-    if (this.destroyVM) {
-      this.vm.destroy();
-      this.vm = null;
-    }
-  }
-
-  handleCodeChange(newCode: string) {
-    this.setState({ code: newCode });
-  }
-
-  toggleFocus(focused: boolean) {
-    this.setState({ focused });
-  }
-
-  clearOutput() {
-    this.outputDiv.innerHTML = "";
-  }
-
-  async run() {
-    // TODO move all these works to Cell class
-    this.clearOutput();
-    this.setState({ status: "running" });
-    // TODO(@qti3e) I think it's better to wrap code in a function.
-    // to prevent possible bugs with having duplicate var names in
-    // docs.
-    await this.vm.exec(this.state.code, this.id);
-    this.setState({ status: "updating" });
-    await delay(100);
-    this.setState({ status: null });
-  }
-
-  initOutputDiv() {
-    if (this.outputDiv) return;
-    // TODO DRY; Maybe move outputHandler logic to Cell class?
-    this.outputDiv = document.createElement("div");
-    this.outputDiv.className = "output";
-    this.outputDiv.id = "output" + this.id;
-    this.outputHandler = new OutputHandlerDOM(this.outputDiv);
-    if (!this.vm) {
-      const rpcHandler = createRPCHandler(this.outputHandler);
-      this.vm = new VM(rpcHandler);
-      this.destroyVM = true;
-    }
-    if (this.outputHTML) {
-      this.outputDiv.innerHTML = this.outputHTML;
-    }
-  }
-
-  render() {
-    this.initOutputDiv();
-
-    return (
-      <Cell
-        id={ this.id }
-        code={ this.state.code }
-        onChange={ this.handleCodeChange.bind(this) }
-        outputDiv={ this.outputDiv }
-        onFocus={ () => this.toggleFocus(true) }
-        onBlur={ () => this.toggleFocus(false) }
-        focused={ this.state.focused }
-        onRun={ this.run.bind(this) }
-        status={ this.state.status }
-        autoRun={ this.props.autoRun }
-      />
     );
   }
 }

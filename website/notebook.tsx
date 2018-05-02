@@ -16,7 +16,7 @@
 import { h, Component } from "preact";
 import { Cell, drainExecuteQueue } from "./cell";
 import { OutputHandlerDOM } from "../src/output_handler";
-import { randomString, delay, createResolvable } from "../src/util";
+import { randomString, createResolvable } from "../src/util";
 import { VM, createRPCHandler } from "./vm";
 import { UserTitle, docTitle } from "./common";
 import * as db from "./db";
@@ -74,7 +74,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   }
 
   clearOutput(cellId: string) {
-    this.state.outputDivs.get(cellId).innerHTML = "";
+    this.cellRefs.get(cellId).clearOutput();
   }
 
   async componentDidMount() {
@@ -134,7 +134,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
 
   async onRun(cellId: string) {
     this.save();
-    this.clearOutput(cellId);
     await this.vm.exec(this.state.codes.get(cellId), cellId);
   }
 
@@ -210,7 +209,6 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           onBlur={ this.onBlur.bind(this, id) }
           focusNext={ this.focusNext.bind(this, id) }
           onChange={ this.onChange.bind(this, id) }
-          autoRun={ true }
         />
       );
     });

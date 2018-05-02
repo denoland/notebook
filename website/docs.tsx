@@ -16,7 +16,8 @@
 import { h } from "preact";
 import { GlobalHeader } from "./common";
 import { VM, createRPCHandler } from "./vm";
-import { StandaloneCell } from "./cell";
+import { Cell } from "./cell";
+import { OutputHandlerDOM } from "../src/output_handler";
 
 let nextCellId: number = 0;
  
@@ -27,24 +28,27 @@ export function registerPrerenderedOutput(output) {
   prerenderedOutputs.set(cellId, output.innerHTML);
 }
 
-const cellLookupTable = new Map<number, StandaloneCell>();
+const outputHandlerLookupTable = new Map<number, OutputHandlerDOM>();
 
 const outputHandlerLookUp = createRPCHandler((id: number) => 
-  cellLookupTable.get(id).outputHandler
+  outputHandlerLookupTable.get(id)
 );
+
 const sandbox = new VM(outputHandlerLookUp);
 
 function cell(src) {
   const id = nextCellId++;
   const outputHTML = prerenderedOutputs.get(id);
   return (
-    <StandaloneCell
-      code={ src }
-      vm={ sandbox }
+    <Cell
       id={ id }
-      outputHTML={ prerenderedOutputs.get(id) }
-      ref={ cell => cellLookupTable.set(id, cell) }
-      autoRun={ outputHTML === null } />
+      code={ src }
+      outputHTML={ outputHTML }
+      onRun={ async code => await sandbox.exec(code, id) }
+      ref={ cell => {
+        const outputHandler = new OutputHandlerDOM(cell.outputDiv);
+        outputHandlerLookupTable.set(id, outputHandler);
+      } } />
   );
 }
 
