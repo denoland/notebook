@@ -16,7 +16,7 @@
 import { h, Component } from "preact";
 import { Cell, drainExecuteQueue } from "./cell";
 import { OutputHandlerDOM } from "../src/output_handler";
-import { randomString, delay } from "../src/util";
+import { randomString, delay, createResolvable } from "../src/util";
 import { VM, createRPCHandler } from "./vm";
 import { UserTitle, docTitle } from "./common";
 import * as db from "./db";
@@ -69,7 +69,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.vm = new VM(rpcHandler);
   }
 
-  componentWillUnMount() {
+  componentWillUnmount() {
     this.vm.destroy();
   }
 
@@ -85,13 +85,13 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       cells.push(newNotebookText);
     }
     for (let i = 0; i < cells.length; ++i) {
-      this.insertCell(i, cells[i]);
-      await delay(50);
+      await this.insertCell(i, cells[i]);
     }
     drainExecuteQueue();
   }
 
-  private insertCell(position: number, code = "", outputHTML?: string) {
+  private async insertCell(position: number, code = ""): Promise<void> {
+    const promise = createResolvable();
     this.setState(state => {
       const id = randomString();
       const outputDiv = document.createElement("div");
@@ -104,8 +104,10 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       state.outputHandlers.set(id, new OutputHandlerDOM(outputDiv));
 
       state.order.splice(position, 0, id);
+      promise.resolve();
       return state;
     });
+    await promise;
   }
   
   onInsertCellClicked(cellId: string) {

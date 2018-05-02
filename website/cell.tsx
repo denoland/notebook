@@ -231,7 +231,7 @@ export class StandaloneCell extends Component<SCellProps, SCellState> {
     if (this.props.vm) this.vm = this.props.vm;
   }
 
-  componentWillUnMount() {
+  componentWillUnmount() {
     if (this.destroyVM) {
       this.vm.destroy();
       this.vm = null;
