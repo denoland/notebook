@@ -14,9 +14,9 @@
  */
 
 import { escape } from "he";
-import { RPC, WindowRPC } from "./rpc";
-import { randomString } from "../src/util";
 import { OutputHandlerDOM } from "../src/output_handler";
+import { randomString } from "../src/util";
+import { RPC, WindowRPC } from "./rpc";
 
 function createIframe(rpcChannelId): HTMLIFrameElement {
   const base = new URL("/sandbox", window.document.baseURI).href;
@@ -47,7 +47,7 @@ function createIframe(rpcChannelId): HTMLIFrameElement {
 export type CellId = number | string;
 
 export class VM {
-  private Iframe: HTMLIFrameElement;
+  private iframe: HTMLIFrameElement;
   private RPC: RPC;
   readonly id: string;
 
@@ -57,8 +57,8 @@ export class VM {
 
   init() {
     if (this.RPC) return;
-    this.Iframe = createIframe(this.id);
-    this.RPC = new WindowRPC(this.Iframe.contentWindow, this.id);
+    this.iframe = createIframe(this.id);
+    this.RPC = new WindowRPC(this.iframe.contentWindow, this.id);
     this.RPC.start(this.rpcHandler);
   }
 
@@ -70,11 +70,11 @@ export class VM {
   destroy() {
     if (!this.RPC) return;
     this.RPC.stop();
-    if (this.Iframe.parentNode) {
-      this.Iframe.parentNode.removeChild(this.Iframe);
+    if (this.iframe.parentNode) {
+      this.iframe.parentNode.removeChild(this.iframe);
     }
     this.RPC = null;
-    this.Iframe = null;
+    this.iframe = null;
   }
 }
 

@@ -13,20 +13,20 @@
    limitations under the License.
  */
 
-import { h, Component } from "preact";
-import { Cell, drainExecuteQueue } from "./cell";
+import { Component, h } from "preact";
 import { OutputHandlerDOM } from "../src/output_handler";
-import { randomString, createResolvable } from "../src/util";
-import { VM, createRPCHandler } from "./vm";
-import { UserTitle, docTitle } from "./common";
+import { createResolvable, randomString, Resolvable } from "../src/util";
+import { Cell, drainExecuteQueue } from "./cell";
+import { docTitle, UserTitle } from "./common";
 import * as db from "./db";
+import { createRPCHandler, VM } from "./vm";
 
 const newNotebookText = "// New Notebook. Insert code here.";
 
 export interface NotebookProps {
   save?: (doc: db.NotebookDoc) => void;
   initialDoc?: db.NotebookDoc;
-  userInfo?: db.UserInfo; // Info about currently logged in user. 
+  userInfo?: db.UserInfo; // Info about currently logged in user.
   clone?: () => void;
 }
 
@@ -37,7 +37,6 @@ export interface NotebookState {
   outputHandlers: Map<string, OutputHandlerDOM>;
 
   order: string[];
-  cloningInProgress: boolean;
 
   editingTitle: boolean;
   title: string;
@@ -46,12 +45,11 @@ export interface NotebookState {
 export class Notebook extends Component<NotebookProps, NotebookState> {
   state = {
     codes: new Map<string, string>(),
+    editingTitle: false,
     outputDivs: new Map<string, Element>(),
     outputHandlers: new Map<string, OutputHandlerDOM>(),
 
     order: [],
-    cloningInProgress: false,
-    editingTitle: false,
     title: ""
   };
   // Save component refs
@@ -61,6 +59,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   vm: VM;
   // Check if user opend this notebook for first time.
   newNotebook: boolean;
+  isReady: Resolvable<void> = createResolvable();
 
   componentWillMount() {
     const rpcHandler = createRPCHandler((id: string) =>
@@ -87,10 +86,11 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     for (let i = 0; i < cells.length; ++i) {
       await this.insertCell(i, cells[i]);
     }
-    drainExecuteQueue();
+    await drainExecuteQueue();
+    this.isReady.resolve();
   }
 
-  private async insertCell(position: number, code = ""): Promise<void> {
+  async insertCell(position: number, code = ""): Promise<void> {
     const promise = createResolvable();
     this.setState(state => {
       const id = randomString();
@@ -109,7 +109,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     });
     await promise;
   }
-  
+
   onInsertCellClicked(cellId: string) {
     const pos = this.state.order.indexOf(cellId);
     this.insertCell(pos + 1);
@@ -145,19 +145,21 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     if (this.active === cellId) this.active = null;
   }
 
-  focusNext(cellId: string) {
+  async focusNext(cellId: string) {
     const index = this.state.order.indexOf(cellId) + 1;
     if (!this.state.order[index]) return;
-    this.goTo(this.state.order[index]);
+    await this.goTo(this.state.order[index]);
   }
 
-  goTo(cellId: string) {
-    console.log(cellId);
+  async goTo(cellId: string) {
     if (this.active === cellId) return;
     const cell = this.cellRefs.get(cellId);
-    console.log(cell);
     if (!cell) return;
-    cell.focus();
+    if (this.active) {
+      const prevCell = this.cellRefs.get(this.active);
+      if (prevCell) prevCell.blur();
+    }
+    await cell.focus();
     this.active = cellId;
   }
 
@@ -196,7 +198,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       const outputDiv = outputDivs.get(id);
       return (
         <Cell
-          ref={ ref => { this.cellRefs.set(id, ref) } }
+          ref={ ref => { this.cellRefs.set(id, ref); } }
           key={ id }
           id={ id }
           code={ code }

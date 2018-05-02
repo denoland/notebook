@@ -3,6 +3,7 @@ import { assert, assertEqual, createResolvable } from "../src/util";
 import { testBrowser } from "../tools/tester";
 import * as db from "./db";
 import * as nb from "./nb";
+import { Notebook } from "./notebook";
 
 testBrowser(async function notebook_NotebookRoot() {
   const mdb = db.enableMock();
@@ -32,116 +33,25 @@ testBrowser(async function notebook_Notebook() {
 });
 
 testBrowser(async function notebook_focusNextCell() {
-  const mdb = db.enableMock();
-  await renderAnonNotebook();
-  assertEqual(mdb.counts, { getDoc: 1 });
-  // Test focusNextCell transitions.
-  const cellEls = document.querySelectorAll(".notebook-cell");
-  assert(cellEls.length >= 2);
-  const first = nb.lookupCell(cellEls[0].id);
-  assert(first != null);
-  const second = nb.lookupCell(cellEls[1].id);
-  assert(second != null);
-  first.focus();
-  assert(cellEls[0].classList.contains("notebook-cell-focus"));
-  assert(!cellEls[1].classList.contains("notebook-cell-focus"));
-  /* FIXME Flaky....
-  // Simulate Shift+Enter
-  first.editor['triggerOnKeyDown']({ keyCode: 13, shiftKey: true });
+  const notebook = await renderNotebook();
+  const cellIds = notebook.state.order;
+  const classList1 = document.getElementById(`cell-${cellIds[0]}`).classList;
+  const classList2 = document.getElementById(`cell-${cellIds[1]}`).classList;
+  await notebook.goTo(cellIds[0]);
   await flush();
-  cellEls = document.querySelectorAll(".notebook-cell");
-  assert(!cellEls[0].classList.contains("notebook-cell-focus"));
-  assert(cellEls[1].classList.contains("notebook-cell-focus"));
-  */
-});
-
-testBrowser(async function notebook_titleEdit() {
-  const mdb = db.enableMock();
-  mdb.signIn();
-  await renderOwnerNotebook();
-  assert(db.defaultDoc.title.length > 1);
-  // Check that we rendered the title.
-  let title: HTMLElement = document.querySelector(".title > h2");
-  assertEqual(db.defaultDoc.title, title.innerText);
-  // Because we are logged in, we should see an edit button for the title.
-  const editButton: HTMLButtonElement = document.querySelector(".edit-title");
-  assert(editButton != null);
-  // The edit button hasn't been clicked yet, so we shouldn't see the
-  // title-input.
-  let titleInput: HTMLInputElement = document.querySelector(".title-input");
-  assert(titleInput == null);
-  // Click the edit button.
-  editButton.click();
+  assertEqual(notebook.active, cellIds[0]);
+  assert(classList1.contains("notebook-cell-focus"));
+  assert(!classList2.contains("notebook-cell-focus"));
+  await notebook.cellRefs.get(cellIds[0]).focusNext();
   await flush();
-  // The edit button has been clicked, so we should see the title-input.
-  titleInput = document.querySelector(".title-input");
-  assert(null !== titleInput);
-  assertEqual(titleInput.value, db.defaultDoc.title);
-  // The save button should be shown.
-  const saveTitle: HTMLButtonElement = document.querySelector(".save-title");
-  assert(saveTitle != null);
-  // Edit the title.
-  titleInput.value = "New Title";
-  // Before the save the db counts look like:
-  assertEqual(mdb.counts, { signIn: 1, getDoc: 1 });
-  // Click the save button.
-  saveTitle.click();
-  await flush();
-  // Check the database saw an updateDoc.
-  assertEqual(mdb.counts, {
-    getDoc: 1,
-    signIn: 1,
-    updateDoc: 1,
-  });
-  // Check the title got updated.
-  title = document.querySelector(".title > h2");
-  assert(title != null);
-  assertEqual("New Title", title.innerText);
-});
-
-testBrowser(async function notebook_deleteLastCell() {
-  await renderOwnerNotebook();
-  const numCells = db.defaultDoc.cells.length;
-  assert(numCells > 2);
-  // Should have same number of delete buttons, as we have cells in the
-  // default doc.
-  const deleteButtons = document.getElementsByClassName("delete-button");
-  assertEqual(deleteButtons.length, numCells);
-  let cells = document.getElementsByClassName("notebook-cell");
-  assertEqual(cells.length, numCells);
-  // Now click all but one of the delete buttons.
-  for (let i = 0; i < numCells - 1; i++) {
-    const deleteButton: HTMLButtonElement =
-        document.querySelector(".delete-button");
-    deleteButton.click();
-    await flush();
-  }
-  cells = document.getElementsByClassName("notebook-cell");
-  assertEqual(cells.length, 1);
-  // Now that there is only one cell left, the delete button should
-  // not be shown.
-  const deleteButton = document.querySelector(".delete-button");
-  assert(deleteButton == null);
+  assertEqual(notebook.active, cellIds[1]);
+  assert(!classList1.contains("notebook-cell-focus"));
+  assert(classList2.contains("notebook-cell-focus"));
 });
 
 testBrowser(async function notebook_progressBar() {
-  resetPage();
-
-  let notebookRoot: nb.NotebookRoot;
-  const promise = createResolvable();
-  const el = h(nb.NotebookRoot, {
-    nbId: "anonymous",
-    onReady: promise.resolve,
-    ref: ref => notebookRoot = ref,
-  });
-  render(el, document.body);
-  await promise;
-
-  const notebook = notebookRoot.notebookRef;
-
-  // We need at least two cells for this test (which have cellId 1 and 2).
-  notebook.onInsertCell(0);
-  notebook.onInsertCell(0);
+  const notebook = await renderNotebook();
+  const cellIds = notebook.state.order;
 
   const progressBar =
       document.querySelector(".notebook-cell .progress-bar") as HTMLElement;
@@ -152,13 +62,12 @@ testBrowser(async function notebook_progressBar() {
   const visible = () => progressBar.style.display === "block";
 
   // Call util.downloadProgress in the notebook sandbox.
-  const downloadProgress = async(job, loaded, total, cellId = 1) => {
-    const sandbox = nb.sandbox();
-    await sandbox.call(
-      "runCell",
-      `import { downloadProgress } from "test_internals";
-       downloadProgress(...${JSON.stringify([job, loaded, total])});`,
-      cellId);
+  const downloadProgress = async(job, loaded, total, cellNo = 1) => {
+    const cellId = cellIds[cellNo - 1];
+    const vm = notebook.vm;
+    await vm.exec(`import { downloadProgress } from "test_internals";
+       await downloadProgress(...${JSON.stringify([job, loaded, total])});`,
+       cellId);
     await flush();
   };
 
@@ -239,18 +148,6 @@ function renderProfile(profileUid: string) {
   return promise;
 }
 
-function renderOwnerNotebook() {
-  resetPage();
-  return new Promise((resolve) => {
-    const el = h(nb.NotebookRoot, {
-      nbId: "default",
-      onReady: resolve,
-      userInfo: db.defaultOwner, // Owns "default" doc.
-    });
-    render(el, document.body);
-  });
-}
-
 function renderAnonNotebook() {
   resetPage();
   return new Promise((resolve) => {
@@ -260,4 +157,29 @@ function renderAnonNotebook() {
     });
     render(el, document.body);
   });
+}
+
+async function renderNotebook(): Promise<Notebook> {
+  document.body.innerHTML = "";
+  let notebook: Notebook;
+  const nb = h(Notebook as any, {
+    initialDoc: {
+      anonymous: true,
+      cells: ["let a = 4", "let b = 5"],
+      created: new Date(),
+      owner: {
+        displayName: "Anonymous",
+        photoURL: "/static/img/anon_profile.png?",
+        uid: "",
+      },
+      title: "Anonymous Notebook. Changes will not be saved.",
+      updated: new Date(),
+    },
+    ref: ref => notebook = ref
+  });
+  render(nb, document.body);
+  assert(!!notebook);
+  await notebook.isReady;
+  await flush();
+  return notebook;
 }

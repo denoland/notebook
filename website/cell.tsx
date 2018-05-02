@@ -13,9 +13,9 @@
    limitations under the License.
  */
 
-import { h, Component } from "preact";
-import { CodeMirrorComponent } from "./codemirror";
+import { Component, h } from "preact";
 import { delay } from "../src/util";
+import { CodeMirrorComponent } from "./codemirror";
 
 const cellExecuteQueue: Cell[] = [];
 
@@ -51,9 +51,9 @@ export class Cell extends Component<CellProps, CellState> {
   parentDiv: Element;
   outputDiv: Element;
   state = {
-    updating: false,
-    running: false
-  }
+    running: false,
+    updating: false
+  };
 
   get code(): string {
     if (!this.cm) return this.props.code;
@@ -91,38 +91,37 @@ export class Cell extends Component<CellProps, CellState> {
   }
 
   clearOutput() {
-    console.log(this.outputDiv);
     this.outputDiv.innerHTML = "";
   }
 
   async run() {
-    // FIXME Using setState will cause component to rerender and 
-    // that's why editor cursor moves to the beginning of code
-    // after pressing ctrl+enter
+    const focus = this.parentDiv.classList.contains("notebook-cell-focus");
     this.clearOutput();
     this.setState({ running: true });
     if (this.props.onRun) await this.props.onRun(this.code);
     this.setState({ updating: true });
     await delay(100);
     this.setState({
-      updating: false,
-      running: false
-    }, this.focus.bind(this));
+      running: false,
+      updating: false
+    }, () => {
+      if (focus) this.focus();
+    });
   }
 
   onChange(code: string) {
     if (this.props.onChange) this.props.onChange(code);
   }
 
-  focusNext() {
-    if (this.props.focusNext) this.props.focusNext();
+  async focusNext() {
+    if (this.props.focusNext) await this.props.focusNext();
   }
 
   runCellAndFocusNext() {
     this.run();
     this.focusNext();
   }
-  
+
   async runCellAndInsertBelow() {
     this.run();
     this.clickedInsertCell();
@@ -133,10 +132,17 @@ export class Cell extends Component<CellProps, CellState> {
   async focus() {
     await delay(100);
     this.cm.focus();
+    // FIXME calling cm.focus does not fire onFocus event.
+    // Do nothing when component is not mounted.
+    if (!this.parentDiv) return;
+    this.parentDiv.classList.add("notebook-cell-focus");
   }
 
   blur() {
     this.cm.blur();
+    // Do nothing when component is not mounted.
+    if (!this.parentDiv) return;
+    this.parentDiv.classList.remove("notebook-cell-focus");
   }
 
   constructor(props) {
@@ -185,7 +191,7 @@ export class Cell extends Component<CellProps, CellState> {
     const { id, code } = this.props;
     const { updating, running } = this.state;
 
-    const inputClass = [ "input" ];
+    const inputClass = ["input"];
     if (updating) inputClass.push("notebook-cell-updating");
     if (running) inputClass.push("notebook-cell-running");
 

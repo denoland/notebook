@@ -14,23 +14,23 @@
  */
 // tslint:disable:variable-name
 import { h } from "preact";
-import { GlobalHeader } from "./common";
-import { VM, createRPCHandler } from "./vm";
-import { Cell } from "./cell";
 import { OutputHandlerDOM } from "../src/output_handler";
+import { Cell } from "./cell";
+import { GlobalHeader } from "./common";
+import { createRPCHandler, VM } from "./vm";
 
-let nextCellId: number = 0;
- 
+let nextCellId = 0;
+
 const prerenderedOutputs = new Map<number, string>();
 
 export function registerPrerenderedOutput(output) {
-  const cellId = Number(output.id.replace("output", ""));
+  const cellId = Number(output.id.replace("output-", ""));
   prerenderedOutputs.set(cellId, output.innerHTML);
 }
 
 const outputHandlerLookupTable = new Map<number, OutputHandlerDOM>();
 
-const outputHandlerLookUp = createRPCHandler((id: number) => 
+const outputHandlerLookUp = createRPCHandler((id: number) =>
   outputHandlerLookupTable.get(id)
 );
 

@@ -1,8 +1,8 @@
 import { h, render, rerender } from "preact";
 import { assert, IS_WEB } from "../src/util";
+import { drainExecuteQueue } from "./cell";
 import { enableFirebase } from "./db";
 import { registerPrerenderedOutput } from "./docs";
-import { drainExecuteQueue } from "./cell";
 import { Router } from "./pages";
 
 assert(IS_WEB);

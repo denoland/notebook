@@ -36,7 +36,8 @@ async function importModule(target) {
   throw new Error("Unknown module: " + target);
 }
 
-let lastExecutedCellId: number = null;
+type CellId = number | string;
+let lastExecutedCellId: CellId = null;
 
 const transpiler = new Transpiler();
 
@@ -45,7 +46,7 @@ const channelId =
 const rpc: RPC = new WindowRPC(window.parent, channelId);
 rpc.start({ runCell });
 
-async function runCell(source: string, cellId: number): Promise<void> {
+async function runCell(source: string, cellId: CellId): Promise<void> {
   lastExecutedCellId = cellId;
   try {
     const console = new Console(rpc, cellId);
@@ -66,17 +67,17 @@ async function runCell(source: string, cellId: number): Promise<void> {
   }
 }
 
-function guessCellId(error?: Error): number {
+function guessCellId(error?: Error): number | string {
   const name = transpiler.getEntryPoint(error);
   if (name != null) {
-    const m = name.match(/cell(\d+)/);
-    if (m) return +m[1];
+    const m = name.match(/cell([\da-z]+)/);
+    if (m) return m[1];
   }
   return lastExecutedCellId;
 }
 
 class Console {
-  constructor(private rpc: RPC, private cellId: number) { }
+  constructor(private rpc: RPC, private cellId: number | string) { }
 
   private print(data: InspectorData) {
     this.rpc.call("print", this.cellId, data);

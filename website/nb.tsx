@@ -19,19 +19,19 @@
 // server-side so the results can be displayed even if javascript is disabled.
 
 import { Component, h } from "preact";
+import { drainExecuteQueue } from "./cell";
 import {
   Avatar,
+  docTitle,
   GlobalHeader,
   Loading,
   normalizeCode,
+  profileLink,
   UserMenu,
-  docTitle,
-  UserTitle,
-  profileLink
+  UserTitle
 } from "./common";
-import { Notebook } from "./notebook";
-import { drainExecuteQueue } from "./cell";
 import * as db from "./db";
+import { Notebook } from "./notebook";
 
 export function resetNotebook() {
   // TODO
@@ -163,6 +163,7 @@ export class NotebookRoot extends Component<NotebookRootProps,
   async handleNotebookSave(doc: db.NotebookDoc) {
     this.setState({ doc });
     if (doc.anonymous) return;
+    if (!this.props.userInfo) return;
     if (this.props.userInfo.uid !== doc.owner.uid) return;
     try {
       await db.active.updateDoc(this.state.nbId, doc);
