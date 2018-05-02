@@ -23,13 +23,6 @@ import * as db from "./db";
 
 const newNotebookText = "// New Notebook. Insert code here.";
 
-export interface CellData {
-  code: string;
-  outputDiv: Element;
-  outputHandler: OutputHandlerDOM;
-  status: null | "running" | "updating";
-}
-
 export interface NotebookProps {
   save?: (doc: db.NotebookDoc) => void;
   initialDoc?: db.NotebookDoc;
@@ -38,9 +31,12 @@ export interface NotebookProps {
 }
 
 export interface NotebookState {
-  cells: Map<string, CellData>;
+  // Cells data
+  codes: Map<string, string>;
+  outputDivs: Map<string, Element>;
+  outputHandlers: Map<string, OutputHandlerDOM>;
+
   order: string[];
-  active: string;
   cloningInProgress: boolean;
 
   editingTitle: boolean;
@@ -49,19 +45,26 @@ export interface NotebookState {
 
 export class Notebook extends Component<NotebookProps, NotebookState> {
   state = {
-    cells: new Map<string, CellData>(),
+    codes: new Map<string, string>(),
+    outputDivs: new Map<string, Element>(),
+    outputHandlers: new Map<string, OutputHandlerDOM>(),
+
     order: [],
-    active: null,
     cloningInProgress: false,
     editingTitle: false,
     title: ""
   };
+  // Save component refs
+  cellRefs = new Map<string, Cell>();
+  // Save current focused Cell to be used in focusNextCell.
+  active: string;
   vm: VM;
+  // Check if user opend this notebook for first time.
   newNotebook: boolean;
 
   componentWillMount() {
     const rpcHandler = createRPCHandler((id: string) =>
-      this.state.cells.get(id).outputHandler
+      this.state.outputHandlers.get(id)
     );
     this.vm = new VM(rpcHandler);
   }
@@ -71,7 +74,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   }
 
   clearOutput(cellId: string) {
-    this.state.cells.get(cellId).outputDiv.innerHTML = "";
+    this.state.outputDivs.get(cellId).innerHTML = "";
   }
 
   async componentDidMount() {
@@ -91,68 +94,70 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   private insertCell(position: number, code = "", outputHTML?: string) {
     this.setState(state => {
       const id = randomString();
-      const cell: CellData = {
-        code,
-        outputDiv: null,
-        outputHandler: null,
-        status: null
-      };
-
       const outputDiv = document.createElement("div");
       outputDiv.className = "output";
       outputDiv.id = "output-" + id;
-      cell.outputHandler = new OutputHandlerDOM(outputDiv);
-      cell.outputDiv = outputDiv;
 
-      state.cells.set(id, cell);
+      // Insert data.
+      state.codes.set(id, code);
+      state.outputDivs.set(id, outputDiv);
+      state.outputHandlers.set(id, new OutputHandlerDOM(outputDiv));
+
       state.order.splice(position, 0, id);
       return state;
     });
   }
   
-  onInsertCellClicked(cell: string) {
-    const pos = this.state.order.indexOf(cell);
-    this.insertCell(pos + 1, "");
+  onInsertCellClicked(cellId: string) {
+    const pos = this.state.order.indexOf(cellId);
+    this.insertCell(pos + 1);
   }
 
-  onDeleteClicked(cell: string) {
-    this.setState(state => {
-      const pos = this.state.order.indexOf(cell);
-      state.cells.delete(cell);
+  onDeleteClicked(cellId: string) {
+    this.setState((state: NotebookState) => {
+      this.cellRefs.delete(cellId);
+      state.codes.delete(cellId);
+      state.outputDivs.delete(cellId);
+      state.outputHandlers.delete(cellId);
+      const pos = this.state.order.indexOf(cellId);
       state.order.splice(pos, 1);
       return state;
     });
   }
 
-  onChange(cell: string, newCode: string) {
+  onChange(cellId: string, newCode: string) {
     // Note: No need to call render() here.
-    this.state.cells.set(cell, {
-      ...this.state.cells.get(cell),
-      code: newCode
-    });
+    this.state.codes.set(cellId, newCode);
   }
 
-  async onRun(cell: string) {
+  async onRun(cellId: string) {
     this.save();
-    this.clearOutput(cell);
-    await this.vm.exec(this.state.cells.get(cell).code, cell);
+    this.clearOutput(cellId);
+    await this.vm.exec(this.state.codes.get(cellId), cellId);
   }
 
-  onFocus(cell: string) {
-    this.goTo(cell);
+  onFocus(cellId: string) {
+    this.active = cellId;
   }
 
-  onBlur(cell: string) {}
+  onBlur(cellId: string) {
+    if (this.active === cellId) this.active = null;
+  }
 
-  focusNext(cell: string) {
-    const index = this.state.order.indexOf(cell) + 1;
+  focusNext(cellId: string) {
+    const index = this.state.order.indexOf(cellId) + 1;
     if (!this.state.order[index]) return;
     this.goTo(this.state.order[index]);
   }
 
-  goTo(cell: string) {
-    if (this.state.active === cell) return;
-    this.setState({ active: cell });
+  goTo(cellId: string) {
+    console.log(cellId);
+    if (this.active === cellId) return;
+    const cell = this.cellRefs.get(cellId);
+    console.log(cell);
+    if (!cell) return;
+    cell.focus();
+    this.active = cellId;
   }
 
   onClone() {
@@ -163,7 +168,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     if (!this.props.save) return;
     const cells = [];
     for (const key of this.state.order) {
-      cells.push(this.state.cells.get(key).code);
+      cells.push(this.state.codes.get(key));
     }
     if (this.newNotebook) {
       if (cells[0].startsWith(newNotebookText)) {
@@ -184,17 +189,17 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   }
 
   renderCells() {
-    const { active, cells, order} = this.state;
+    const { order, codes, outputDivs } = this.state;
     return order.map(id => {
-      const cell = cells.get(id);
+      const code = codes.get(id);
+      const outputDiv = outputDivs.get(id);
       return (
         <Cell
+          ref={ ref => { this.cellRefs.set(id, ref) } }
           key={ id }
           id={ id }
-          code={ cell.code }
-          outputDiv={ cell.outputDiv }
-          focused={ active === id }
-          status={ cell.status }
+          code={ code }
+          outputDiv={ outputDiv }
 
           onDelete={ this.onDeleteClicked.bind(this, id) }
           onInsertCell={ this.onInsertCellClicked.bind(this, id) }

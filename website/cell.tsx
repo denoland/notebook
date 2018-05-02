@@ -38,17 +38,24 @@ export interface CellProps {
   id?: number | string;
   focusNext?: () => void;
 
-  focused?: boolean;
-  status?: null | "running" | "updating";
-
   code: string;
   outputDiv: Element;
   autoRun?: boolean;
 }
 
-export class Cell extends Component<CellProps, {}> {
+export interface CellState {
+  updating: boolean;
+  running: boolean;
+}
+
+export class Cell extends Component<CellProps, CellState> {
   cm: CodeMirrorComponent;
   autoRun: boolean = true;
+  parentDiv: Element;
+  state = {
+    updating: false,
+    running: false
+  }
 
   clickedRun() {
     if (this.props.onRun) this.props.onRun();
@@ -68,14 +75,24 @@ export class Cell extends Component<CellProps, {}> {
 
   onFocus() {
     if (this.props.onFocus) this.props.onFocus();
+    // Do nothing when component is not mounted.
+    if (!this.parentDiv) return;
+    this.parentDiv.classList.add("notebook-cell-focus");
   }
 
   onBlur() {
     if (this.props.onBlur) this.props.onBlur();
+    // Do nothing when component is not mounted.
+    if (!this.parentDiv) return;
+    this.parentDiv.classList.remove("notebook-cell-focus");
   }
 
   async run() {
+    this.setState({ running: true });
     if (this.props.onRun) await this.props.onRun();
+    this.setState({ updating: true });
+    await delay(100);
+    this.setState({ updating: false, running: false });
   }
 
   onChange(code: string) {
@@ -120,13 +137,6 @@ export class Cell extends Component<CellProps, {}> {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.focused !== this.props.focused) {
-      if (nextProps.focused) this.focus();
-      else this.blur();
-    }
-  }
-
   render() {
     const runButton = (
       <button class="run-button" onClick={ this.clickedRun.bind(this) } />
@@ -150,15 +160,17 @@ export class Cell extends Component<CellProps, {}> {
       );
     }
 
-    const { id, outputDiv, code, status, focused} = this.props;
+    const { id, outputDiv, code } = this.props;
+    const { updating, running } = this.state;
+
     const inputClass = [ "input" ];
-    if (status) {
-      inputClass.push("notebook-cell-" + status);
-    }
+    if (updating) inputClass.push("notebook-cell-updating");
+    if (running) inputClass.push("notebook-cell-running");
 
     return (
       <div
-        class={ "notebook-cell " + (focused ? "notebook-cell-focus" : "")}
+        class="notebook-cell"
+        ref={ ref => { this.parentDiv = ref; } }
         id={ `cell-${id}` } >
         <div
           class={ inputClass.join(" ") } >
@@ -176,7 +188,7 @@ export class Cell extends Component<CellProps, {}> {
           { runButton }
         </div>
         <div class="progress-bar" />
-        <div class="output-container" ref={ div => {
+        <div class="output-container" ref={ (div: any) => {
           if (div) div.prepend(outputDiv);
         }}>
           { insertButton }
@@ -198,7 +210,6 @@ interface SCellProps {
 interface SCellState {
   code: string;
   focused: boolean;
-  status: null | "running" | "updating";
 }
 
 export class StandaloneCell extends Component<SCellProps, SCellState> {
@@ -215,8 +226,7 @@ export class StandaloneCell extends Component<SCellProps, SCellState> {
     this.outputHTML = props.outputHTML;
     this.state = {
       code: props.code,
-      focused: false,
-      status: null
+      focused: false
     };
     if (this.props.vm) this.vm = this.props.vm;
   }
