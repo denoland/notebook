@@ -21,7 +21,7 @@ import { Footer, GlobalHeader } from "./common";
 import * as db from "./db";
 import { Docs } from "./docs";
 import { PropelIndex } from "./index";
-import * as nb from "./nb";
+import * as nb from "./notebook_root";
 
 export interface Page {
   title: string;

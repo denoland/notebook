@@ -2,8 +2,8 @@ import { h, render, rerender } from "preact";
 import { assert, assertEqual, createResolvable } from "../src/util";
 import { testBrowser } from "../tools/tester";
 import * as db from "./db";
-import * as nb from "./nb";
 import { Notebook } from "./notebook";
+import * as nb from "./notebook_root";
 
 testBrowser(async function notebook_NotebookRoot() {
   const mdb = db.enableMock();
