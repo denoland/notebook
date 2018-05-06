@@ -21,7 +21,7 @@
 import { Component, h } from "preact";
 import { OutputHandlerDOM } from "../src/output_handler";
 import { createResolvable, randomString, Resolvable } from "../src/util";
-import { Cell, drainExecuteQueue } from "./cell";
+import { Cell, drainExecuteQueue, OUTPUT_ID_PREFIX } from "./cell";
 import { docTitle, UserTitle } from "./common";
 import * as db from "./db";
 import { createRPCHandler, VM } from "./vm";
@@ -101,7 +101,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       const id = randomString();
       const outputDiv = document.createElement("div");
       outputDiv.className = "output";
-      outputDiv.id = "output-" + id;
+      outputDiv.id = OUTPUT_ID_PREFIX + id;
 
       // Insert data.
       state.codes.set(id, code);

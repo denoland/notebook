@@ -33,6 +33,8 @@ export async function drainExecuteQueue() {
   }
 }
 
+export const OUTPUT_ID_PREFIX = "output-";
+
 export interface CellProps {
   onDelete?: () => void;
   onInsertCell?: () => void;
@@ -159,7 +161,7 @@ export class Cell extends Component<CellProps, CellState> {
     } else {
       this.outputDiv = document.createElement("div");
       this.outputDiv.className = "output";
-      this.outputDiv.id = "output-" + props.id;
+      this.outputDiv.id = OUTPUT_ID_PREFIX + props.id;
     }
     if (props.outputHTML) {
       this.outputDiv.innerHTML = props.outputHTML;

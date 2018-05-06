@@ -15,7 +15,7 @@
 // tslint:disable:variable-name
 import { h } from "preact";
 import { OutputHandlerDOM } from "../src/output_handler";
-import { Cell } from "./cell";
+import { Cell, OUTPUT_ID_PREFIX } from "./cell";
 import { GlobalHeader } from "./common";
 import { createRPCHandler, VM } from "./vm";
 
@@ -24,7 +24,7 @@ let nextCellId = 0;
 const prerenderedOutputs = new Map<number, string>();
 
 export function registerPrerenderedOutput(output) {
-  const cellId = Number(output.id.replace("output-", ""));
+  const cellId = Number(output.id.replace(OUTPUT_ID_PREFIX, ""));
   prerenderedOutputs.set(cellId, output.innerHTML);
 }
 
