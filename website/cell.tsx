@@ -13,6 +13,13 @@
    limitations under the License.
  */
 
+/**
+ * This module contains the Cell component, which represents
+ * a single input/output pair inside a notebook.
+ * Cells can be rendered individually, as is done in the docs,
+ * or as part of a whole notebook (see Notebook component).
+ */
+
 import { Component, h } from "preact";
 import { delay } from "../src/util";
 import { CodeMirrorComponent } from "./codemirror";

@@ -13,6 +13,11 @@
    limitations under the License.
  */
 
+/**
+ * This module contains the Notebook component,
+ * which contains many Cell components.
+ */
+
 import { Component, h } from "preact";
 import { OutputHandlerDOM } from "../src/output_handler";
 import { createResolvable, randomString, Resolvable } from "../src/util";
