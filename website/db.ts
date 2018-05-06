@@ -317,33 +317,10 @@ export const defaultOwner: UserInfo = Object.freeze({
 
 const defaultDocCells: ReadonlyArray<string> = Object.freeze([
 `
-import { tensor } from "propel";
-t = tensor([[2, 3], [30, 20]])
-t.mul(5)
+console.log("Hello");
 `,
 `
-import { grad, linspace, plot } from "propel";
-f = (x) => tensor(x).mul(x);
-x = linspace(-4, 4, 200);
-plot(x, f(x),
-     x, grad(f)(x));
-`,
-`
-f = await fetch('/data/mnist/README');
-t = await f.text();
-t;
-`,
-`
-import { tensor } from "propel";
-function f(x) {
-  let y = x.sub(1);
-  let z = tensor(-1).sub(x);
-  return x.greater(0).select(y,z).relu();
-}
-x = linspace(-5, 5, 100)
-plot(x, f(x))
-plot(x, grad(f)(x))
-grad(f)([-3, -0.5, 0.5, 3])
+1 + 2
 `
 ]);
 

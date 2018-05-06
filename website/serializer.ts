@@ -13,8 +13,6 @@
    limitations under the License.
  */
 
-import { toString as formatTensor } from "../src/format";
-import { Tensor } from "../src/tensor";
 import { isNumericalKey } from "../src/util";
 
 export interface AtomDescriptor {
@@ -46,17 +44,11 @@ export interface FunctionDescriptor extends BaseObjectDescriptor {
 export interface ObjectDescriptor extends BaseObjectDescriptor {
   type: "object";
 }
-export interface TensorDescriptor extends BaseObjectDescriptor {
-  type: "tensor";
-  dtype: string;
-  shape: number[];
-  formatted: string;
-}
 
 export type ValueDescriptor =
   // TODO: add Maps and Sets.
   AtomDescriptor | PrimitiveDescriptor | ArrayDescriptor | BoxDescriptor |
-  ObjectDescriptor | FunctionDescriptor | TensorDescriptor;
+  ObjectDescriptor | FunctionDescriptor;
 export type DescriptorRef = number;
 export interface DescriptorSet { [id: number]: ValueDescriptor; }
 
@@ -159,8 +151,6 @@ class DescriptionBuilder {
     // Capture the name of the constructor.
     if (proto === null) {
       d.ctor = null; // Object has no prototype, so the constructor is null.
-    } else if (proto.constructor === Tensor) {
-      d.ctor = "Tensor"; // Work around `Tensor` being renamed by minifier.
     } else if (typeof proto.constructor === "function") {
       d.ctor = proto.constructor.name;
     } else {
@@ -169,7 +159,6 @@ class DescriptionBuilder {
 
     // Some helper variables that we need later to decide which keys to skip.
     const valueIsBoxedString = value instanceof String;
-    const valueIsTensor = value instanceof Tensor;
 
     // List named properties and symbols.
     const keys = [
@@ -185,9 +174,7 @@ class DescriptionBuilder {
       }
       // Set the 'hidden' flag for non-enumerable properties, as well as a few
       // known-private fields.
-      const hidden = !descriptor.enumerable ||
-                     (valueIsTensor && key === "_id") ||
-                     (valueIsTensor && key === "storage");
+      const hidden = !descriptor.enumerable;
       // If the `showHidden` option is not set, skip hidden properties.
       if (hidden && !this.options.showHidden) {
         continue;
@@ -241,16 +228,6 @@ class DescriptionBuilder {
         length: value.length,
         ...d
       } as ArrayDescriptor;
-    } else if (value instanceof Tensor) {
-      // Tensor shapes [] and [1] are equivalent, but the latter looks better.
-      const tensor = value.shape.length > 0 ? value : value.reshape([1]);
-      return {
-        type: "tensor",
-        dtype: tensor.dtype,
-        shape: [...tensor.shape],
-        formatted: formatTensor(tensor),
-        ...d,
-      } as TensorDescriptor;
     } else if ((value instanceof Boolean || value instanceof Number ||
               value instanceof String) && succeeds(() => value.valueOf())) {
       // This is a box object as they are created by e.g. `new Number(3)`.

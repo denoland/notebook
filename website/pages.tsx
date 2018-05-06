@@ -15,11 +15,8 @@
 // tslint:disable:variable-name
 // This is the propelml.org website. It is used both server-side and
 // client-side for generating HTML.
-import { readFileSync } from "fs";
 import { Component, h, render } from "preact";
-import { Footer, GlobalHeader } from "./common";
 import * as db from "./db";
-import { Docs } from "./docs";
 import { PropelIndex } from "./index";
 import * as nb from "./notebook_root";
 
@@ -33,19 +30,6 @@ export interface Page {
 export function renderPage(p: Page): void {
   render(h(p.root, null), document.body, document.body.children[0]);
 }
-
-export const References = (props) => {
-  const refhtml = readFileSync(__dirname + "/references.html", "utf8");
-  return (
-    <div class="references">
-      <GlobalHeader subtitle="References" />
-      <p class="references__details">
-      This work is inspired by and built upon great technologies.</p>
-      <div dangerouslySetInnerHTML={ { __html: refhtml } } />
-      <Footer />
-    </div>
-  );
-};
 
 export let firebaseUrls = [
   "https://www.gstatic.com/firebasejs/4.9.0/firebase.js",
@@ -138,17 +122,5 @@ export const pages: Page[] = [
     path: "notebook/index.html",
     root: nb.NotebookRoot,
     route: /^\/notebook/,
-  },
-  {
-    title: "Propel References",
-    path: "references/index.html",
-    root: References,
-    route: /^\/references(.html)?/,
-  },
-  {
-    title: "Propel Docs",
-    path: "docs/index.html",
-    root: Docs,
-    route: /^\/docs/,
   },
 ];

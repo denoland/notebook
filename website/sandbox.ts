@@ -13,9 +13,6 @@
    limitations under the License.
  */
 
-import * as propel from "../src/api";
-import * as matplotlib from "../src/matplotlib";
-import * as mnist from "../src/mnist";
 import * as test_internals from "./test_internals";
 
 import { global, globalEval, setOutputHandler } from "../src/util";
@@ -25,9 +22,6 @@ import { describe, InspectorData, InspectorOptions } from "./serializer";
 
 async function importModule(target) {
   const m = {
-    matplotlib,
-    mnist,
-    propel,
     test_internals
   }[target];
   if (m) {
@@ -102,10 +96,6 @@ class Console {
 }
 
 setOutputHandler({
-  imshow(data: any): void {
-    rpc.call("imshow", guessCellId(), data);
-  },
-
   plot(data: any): void {
     rpc.call("plot", guessCellId(), data);
   },

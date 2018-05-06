@@ -49,13 +49,8 @@ async function bundler(build) {
   let b = new Bundler("website/sandbox.ts", opts);
   await b.bundle();
 
-  b = new Bundler("tools/test_dl.ts", opts);
-  await b.bundle();
-
   b = new Bundler("tools/test_website.ts", opts);
   await b.bundle();
-
-  run.gendoc(wdir + "docs.json");
 
   const indexBunder = new Bundler("website/index.html", opts);
   return indexBunder;

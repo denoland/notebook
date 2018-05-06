@@ -110,20 +110,6 @@ export class Inspector extends Component<InspectorData, void>{
     // expand button is clicked.
     const listItems: ElementList = [];
 
-    if (d.type === "tensor") {
-      // TODO: the tensor is currently formatted by Tensor.toString(),
-      // and displayed in a monospace font. Make it nicer by using a table.
-      // Remove the outer layer of square brackets added by toString().
-      const formatted = d.formatted.replace(/(^\[)|(\]$)/g, "")
-                                   .replace(/,\n+ /g, "\n");
-      listItems.push(
-        <li class="inspector__li inspector__prop">
-          <div class="inspector__content inspector__content--pre">
-            { formatted }
-          </div>
-        </li>
-      );
-    }
     // Add regular array/object properties.
     const isArray = d.type === "array";
     listItems.push(...d.props.map((prop, index) =>
@@ -193,28 +179,6 @@ export class Inspector extends Component<InspectorData, void>{
           ...this.renderPropListWithBraces(d, list)
         );
         break;
-      case "tensor":
-        // Tensor(float32) [1]
-        // Tensor(float32 15) [1, 2, 3, ...etc...]
-        // Tensor(float32 2✕2) [[1, 2], [3, 4]]
-        // Tensor(uint32 3✕4✕4) [[[[...tensor...]]], foo: bar]
-        const isScalar = d.shape.length === 0 ||
-                         (d.shape.length === 1 && d.shape[0] === 1);
-        elements.push(
-          <span class="cm-def">{ d.ctor }</span>,
-          "(",
-          <span class="cm-string-2">{ d.dtype }</span>
-        );
-        if (!isScalar) {
-          for (const [dim, size] of d.shape.entries()) {
-            elements.push(
-              dim === 0 ? " " : "✕",
-              <span class="cm-number">{ size }</span>
-            );
-          }
-        }
-        elements.push(") [", list, "]");
-        break;
       case "object":
         // Constructor name is omitted when it's "Object", or when the
         // object doesn't have a prototype at all (ctor === null).
@@ -253,10 +217,6 @@ export class Inspector extends Component<InspectorData, void>{
     // If a reference is circular it can't be expanded.
     if (this.parents.has(d)) {
       return false;
-    }
-    // Tensors can be always expanded to show its values.
-    if (d.type === "tensor") {
-      return true;
     }
     // Objects can be expanded if they have properties.
     if ((d.type === "array" || d.type === "box" || d.type === "function" ||

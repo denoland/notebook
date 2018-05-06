@@ -26,9 +26,6 @@ export const PropelIndex = (props) => {
       <div class="intro flex-row">
         <div class="flex-cell">
           <div dangerouslySetInnerHTML={ { __html: md } } />
-          <p><a href="http://github.com/propelml/propel"
-            >github.com/propelml/propel</a>
-          </p>
         </div>
       </div>
     </div>

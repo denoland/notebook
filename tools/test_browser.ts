@@ -43,11 +43,6 @@ if (IS_NODE) {
 // Hit 'enter' in the terminal to stop the webserver and exit the browser.
 const debug = !!process.env.PP_TEST_DEBUG;
 
-// When the PP_TEST_DL environment variable is set, the DeepLearn test suite is
-// also executed. Since webgl isn't available in headless mode, this flag
-// causes Chromium to run in interactive mode.
-const testdl = !!process.env.PP_TEST_DL;
-
 // Run headless only if CI env var is set.
 const headless = (process.env.CI != null);
 
@@ -72,14 +67,6 @@ const TESTS: Test[] = [
   // page, the test fails.
   propelTests,
 ];
-
-if (testdl) {
-  TESTS.unshift({
-    path: "static/test.html#script=/test_dl.js",
-    doneMsg: /DONE/,
-    timeout: 2 * 60 * 1000
-  });
-}
 
 (async() => {
   let passed = 0, failed = 0;

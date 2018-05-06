@@ -97,12 +97,6 @@ export function createRPCHandler(handler: OutputHandlerDOM | LookupCell) {
       cell.print(data);
     },
 
-    imshow(cellId: CellId, data: any): void {
-      const cell = lookupCell(cellId);
-      if (!cell) return;
-      cell.imshow(data);
-    },
-
     downloadProgress(cellId: CellId, data: any): void {
       const cell = lookupCell(cellId);
       if (!cell) return;

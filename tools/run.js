@@ -7,7 +7,6 @@ const rimraf = require("rimraf");
 process.env.TS_NODE_TYPE_CHECK = true;
 
 require("ts-node").register({"typeCheck": true });
-const gendoc = require("./gendoc.ts");
 
 // Always chdir to propel's project root.
 const root = resolve(__dirname, "..");
@@ -102,16 +101,6 @@ function version() {
   let pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
   return pkg.version;
 }
-
-exports.gendoc = (fn) => {
-  let gendocFlag = (process.argv.indexOf("gendoc") >= 0);
-  if (gendocFlag || !fs.existsSync(fn)) {
-    const docs = gendoc.genJSON();
-    const docsJson = JSON.stringify(docs, null, 2);
-    fs.writeFileSync(fn, docsJson);
-  }
-}
-
 
 exports.mkdir = mkdir;
 exports.parcel = parcel;

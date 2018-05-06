@@ -21,7 +21,6 @@ import { h , render } from "preact";
 import * as vega from "vega-lib";
 import { Inspector } from "../website/inspector";
 import { InspectorData } from "../website/serializer";
-import { createCanvas, Image } from "./im";
 
 export type PlotData = Array<Array<{ x: number, y: number }>>;
 
@@ -35,7 +34,6 @@ export interface Progress {
 }
 
 export interface OutputHandler {
-  imshow(image: Image): void;
   plot(data: PlotData): void;
   print(text: InspectorData | string): void;
   downloadProgress(progress: Progress);
@@ -48,11 +46,6 @@ export class OutputHandlerDOM implements OutputHandler {
   private progressJobs = new Map<string, Progress>();
 
   constructor(private element: Element) {}
-
-  imshow(image: Image): void {
-    const canvas = createCanvas(image);
-    this.element.appendChild(canvas);
-  }
 
   vega(spec: VegaSpec, config: VegaConfig = {}) {
     const runtime = vega.parse(spec, config);

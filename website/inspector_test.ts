@@ -1,5 +1,4 @@
 import { h, render } from "preact";
-import { ones } from "../src/api";
 import { assertEqual } from "../src/util";
 import { test, testBrowser } from "../tools/tester";
 import { Inspector } from "./inspector";
@@ -231,7 +230,6 @@ testBrowser(async function inspector_component() {
     number: 21,
     self: null,
     string: "text",
-    tensor: ones([3, 3]).cast("int32")
   };
   val1.self = val1;
   const val2 = 42;
@@ -248,11 +246,6 @@ testBrowser(async function inspector_component() {
       number: 21
       self: [circular]
       string: "text"
-      tensor: Tensor(int32 3✕3) [
-        [1, 1, 1]
-        [1, 1, 1]
-        [1, 1, 1]
-      ]
     }
     42
     {
