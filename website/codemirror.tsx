@@ -21,6 +21,8 @@
 import { Component, h } from "preact";
 import { normalizeCode } from "./common";
 
+const codeMirrorElements = new Map<string, Element>();
+
 const defaultOptions = {
   lineNumbers: false,
   lineWrapping: true,
@@ -38,6 +40,7 @@ export interface CodeMirrorProps {
   onShiftEnter?: () => void;
   onCtrlEnter?: () => void;
   onChange?: (code: string) => void;
+  id?: string;
 }
 export interface CodeMirrorState { }
 
@@ -86,9 +89,20 @@ export class CodeMirrorComponent extends
     // Find pre to replace by codemirror instance.
     const pre = this.pre;
     const parentEl = pre.parentElement;
+    const id = this.props.id;
+
+    if (id && codeMirrorElements.has(id)) {
+      const el = codeMirrorElements.get(id);
+      parentEl.replaceChild(el, pre);
+      this.editor = el["CodeMirror"] as CodeMirror.Editor;
+      return;
+    }
 
     this.editor =
-      CodeMirror(div => parentEl.replaceChild(div, pre), options);
+      CodeMirror(div => {
+        parentEl.replaceChild(div, pre);
+        if (id) codeMirrorElements.set(id, div);
+      }, options);
     this.editor.setOption("extraKeys", {
       "Alt-Enter": () => {
         if (this.props.onAltEnter) this.props.onAltEnter();

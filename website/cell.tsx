@@ -203,6 +203,7 @@ export class Cell extends Component<CellProps, CellState> {
         <div
           class={ inputClass.join(" ") } >
           <CodeMirrorComponent
+            id={ id ? String(id) : undefined }
             ref={ ref => { this.cm = ref; } }
             code={ code }
             onFocus={ this.onFocus.bind(this) }
