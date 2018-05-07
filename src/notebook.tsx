@@ -100,10 +100,13 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     this.isReady.resolve();
   }
 
-  async insertCell(position: number, code = ""): Promise<void> {
+  /**
+   * insertCell returns a promise that resolves to the newly inserted cell id.
+   */
+  async insertCell(position: number, code = ""): Promise<string> {
     const promise = createResolvable();
+    const id = randomString();
     this.setState(state => {
-      const id = randomString();
       const outputDiv = document.createElement("div");
       outputDiv.className = "output";
       outputDiv.id = OUTPUT_ID_PREFIX + id;
@@ -118,6 +121,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       return state;
     });
     await promise;
+    return id;
   }
 
   onInsertCellClicked(cellId: string) {

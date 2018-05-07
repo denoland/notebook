@@ -1,6 +1,7 @@
 import { h, render, rerender } from "preact";
 import { assert, assertEqual, createResolvable } from "../src/util";
 import { testBrowser } from "../tools/tester";
+import { cellExecuteQueue } from "./cell";
 import * as db from "./db";
 import { Notebook } from "./notebook";
 import * as nb from "./notebook_root";
@@ -134,6 +135,28 @@ testBrowser(async function notebook_profile() {
   assertEqual(mdb.counts, { queryProfile: 2 });
 });
 
+testBrowser(async function notebook_executeQueue() {
+  const { notebookRef } = await renderAnonNotebook();
+  // All the cells must be executed now.
+  assertEqual(cellExecuteQueue.length, 0);
+  const cell1 = await notebookRef.insertCell(2, "a = 0");
+  await notebookRef.onRun(cell1);
+  // New cell has been inserted to execute queue.
+  // and we're not going to call drainExecuteQueue()
+  // so we must have 1 cell in the array.
+  assertEqual(cellExecuteQueue.length, 1);
+  const cell2 = await notebookRef.insertCell(3, "a++");
+  await notebookRef.onRun(cell2);
+  assertEqual(cellExecuteQueue.length, 2);
+  const cell3 = await notebookRef.insertCell(4, "console.log(`<${a}>`)");
+  await notebookRef.onRun(cell3);
+  assertEqual(cellExecuteQueue.length, 3);
+  await flush();
+  const outputDiv = notebookRef.state.outputDivs.get(cell3);
+  const output = outputDiv.innerHTML;
+  assert(output.indexOf("&lt;1&gt;") > 0);
+});
+
 // Call this to ensure that the DOM has been updated after events.
 function flush(): Promise<void> {
   rerender();
@@ -156,15 +179,19 @@ function renderProfile(profileUid: string) {
   return promise;
 }
 
-function renderAnonNotebook() {
+async function renderAnonNotebook(): Promise<nb.NotebookRoot> {
+  const promise = createResolvable();
   resetPage();
-  return new Promise((resolve) => {
-    const el = h(nb.NotebookRoot, {
-      nbId: "default",
-      onReady: resolve,
-    });
-    render(el, document.body);
+  let notebookRoot: nb.NotebookRoot;
+  const el = h(nb.NotebookRoot, {
+    nbId: "default",
+    onReady: promise.resolve,
+    ref: n => notebookRoot = n
   });
+  render(el, document.body);
+  await promise;
+  await notebookRoot.notebookRef.isReady;
+  return notebookRoot;
 }
 
 async function renderNotebook(): Promise<Notebook> {

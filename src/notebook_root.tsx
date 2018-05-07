@@ -19,7 +19,6 @@
 // server-side so the results can be displayed even if javascript is disabled.
 
 import { Component, h } from "preact";
-import { drainExecuteQueue } from "./cell";
 import {
   Avatar,
   docTitle,
@@ -154,8 +153,6 @@ export class NotebookRoot extends Component<NotebookRootProps,
     // Call the onReady callback for testing.
     if (this.state.errorMsg || this.state.mostRecent ||
         this.state.profileLatest || this.state.doc) {
-      // Make sure the notebook has fully executed.
-      await drainExecuteQueue();
       if (this.props.onReady) this.props.onReady();
     }
   }

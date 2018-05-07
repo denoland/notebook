@@ -24,7 +24,7 @@ import { Component, h } from "preact";
 import { delay } from "../src/util";
 import { CodeMirrorComponent } from "./codemirror";
 
-const cellExecuteQueue: Cell[] = [];
+export const cellExecuteQueue: Cell[] = [];
 
 export async function drainExecuteQueue() {
   while (cellExecuteQueue.length > 0) {
