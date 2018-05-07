@@ -39,7 +39,7 @@ async function bundler(build) {
     autoinstall: false,
     cache: true,
     hmr: false,
-    logLevel: process.env.CI ? 1 : null,
+    logLevel: process.env.CI ? 1 : 3,
     minify: prodFlag,
     outDir: wdir,
     production: prodFlag,
