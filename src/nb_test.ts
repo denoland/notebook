@@ -5,6 +5,8 @@ import * as db from "./db";
 import { Notebook } from "./notebook";
 import * as nb from "./notebook_root";
 
+const DOC_TITLE = "Anonymous Notebook";
+
 testBrowser(async function notebook_NotebookRoot() {
   const mdb = db.enableMock();
   resetPage();
@@ -108,6 +110,12 @@ testBrowser(async function notebook_progressBar() {
   assertEqual(percent(), 0);
 });
 
+testBrowser(async function notebook_title() {
+  const currentTitle = document.title = "Propel Tests";
+  await renderNotebook();
+  assertEqual(document.title, `${currentTitle} | ${DOC_TITLE}`);
+});
+
 testBrowser(async function notebook_profile() {
   const mdb = db.enableMock();
   await renderProfile("non-existant");
@@ -172,7 +180,7 @@ async function renderNotebook(): Promise<Notebook> {
         photoURL: "/static/img/anon_profile.png?",
         uid: "",
       },
-      title: "Anonymous Notebook. Changes will not be saved.",
+      title: DOC_TITLE,
       updated: new Date(),
     },
     ref: ref => notebook = ref

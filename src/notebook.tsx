@@ -20,13 +20,15 @@
 
 import { Component, h } from "preact";
 import { OutputHandlerDOM } from "../src/output_handler";
-import { createResolvable, randomString, Resolvable } from "../src/util";
+import { createResolvable, IS_WEB,
+  randomString, Resolvable } from "../src/util";
 import { Cell, drainExecuteQueue, OUTPUT_ID_PREFIX } from "./cell";
 import { docTitle, UserTitle } from "./common";
 import * as db from "./db";
 import { createRPCHandler, VM } from "./vm";
 
 const newNotebookText = "// New Notebook. Insert code here.";
+const DEFAULT_TITLE = IS_WEB && document.title;
 
 export interface NotebookProps {
   save?: (doc: db.NotebookDoc) => void;
@@ -74,6 +76,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   }
 
   componentWillUnmount() {
+    document.title = DEFAULT_TITLE;
     this.vm.destroy();
   }
 
@@ -82,7 +85,9 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
   }
 
   async componentDidMount() {
-    this.setState({ title: this.props.initialDoc.title });
+    const { title } = this.props.initialDoc;
+    document.title = `${DEFAULT_TITLE} | ${title}`;
+    this.setState({ title });
     const cells = this.props.initialDoc.cells;
     if (cells.length === 0) {
       this.newNotebook = true;
@@ -234,6 +239,7 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
           class="save-title green-button"
           onClick={ () => {
             this.setState({ editingTitle: false });
+            document.title = `${DEFAULT_TITLE} | ${title}`;
             this.save();
           } } >
           Save

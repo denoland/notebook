@@ -47,7 +47,7 @@ const anonDoc = {
     photoURL: "/static/img/anon_profile.png?",
     uid: "",
   },
-  title: "Anonymous Notebook. Changes will not be saved.",
+  title: "Anonymous Notebook",
   updated: new Date(),
 };
 
