@@ -29,8 +29,8 @@ async function bundler(build) {
   run.mkdir("build");
   run.mkdir(wdir);
   run.mkdir(wdir + "src"); // Needed for npy_test
-  run.symlink(run.root + "/website/", wdir + "static");
-  run.symlink(run.root + "/website/img", wdir + "img");
+  run.symlink(run.root + "/src/", wdir + "static");
+  run.symlink(run.root + "/src/img", wdir + "img");
   run.symlink(run.root + "/deps/data/", wdir + "data");
   // Needed for npy_test
   run.symlink(run.root + "/src/testdata/", wdir + "src/testdata");
@@ -46,13 +46,13 @@ async function bundler(build) {
     watch: !build
   };
 
-  let b = new Bundler("website/sandbox.ts", opts);
+  let b = new Bundler("src/sandbox.ts", opts);
   await b.bundle();
 
   b = new Bundler("tools/test_website.ts", opts);
   await b.bundle();
 
-  const indexBunder = new Bundler("website/index.html", opts);
+  const indexBunder = new Bundler("src/index.html", opts);
   return indexBunder;
 }
 

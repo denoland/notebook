@@ -7,9 +7,9 @@ const extra = process.argv.slice(2).join(" ");
 run.sh(`node ./node_modules/stylelint/bin/stylelint.js
   ${extra}
   --config stylelint.json
-  website/main.scss
-  website/normalize.scss
-  website/syntax.scss
-  website/syntax_dark.scss
-  website/syntax_light.scss
+  src/main.scss
+  src/normalize.scss
+  src/syntax.scss
+  src/syntax_dark.scss
+  src/syntax_light.scss
 `);

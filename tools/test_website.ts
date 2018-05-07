@@ -1,6 +1,6 @@
 // Tests that only run in the browser.
 import "../src/fetch_test";
-import "../website/inspector_test";
-import "../website/nb_test";
-import "../website/nb_transpiler_test";
-import "../website/rpc_test";
+import "../src/inspector_test";
+import "../src/nb_test";
+import "../src/nb_transpiler_test";
+import "../src/rpc_test";
