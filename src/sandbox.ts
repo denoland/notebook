@@ -15,19 +15,38 @@
 
 import * as test_internals from "./test_internals";
 
-import { global, globalEval, setOutputHandler } from "../src/util";
+import { fetchArrayBuffer } from "./fetch";
 import { Transpiler } from "./nb_transpiler";
 import { RPC, WindowRPC } from "./rpc";
 import { describe, InspectorData, InspectorOptions } from "./serializer";
+import { assertEqual, global, globalEval, setOutputHandler } from "./util";
+
+async function fetchText(url: string) {
+  const ab = await fetchArrayBuffer(url);
+  const enc = new TextDecoder();
+  return enc.decode(ab);
+}
 
 async function importModule(target) {
+  // Import built-in mpodule.
   const m = {
     test_internals
   }[target];
   if (m) {
     return m;
   }
-  throw new Error("Unknown module: " + target);
+
+  // Import remote module with AMD.
+  const source = await fetchText(target);
+  let exports = {};
+  global.define = function(dependencies, constructor) {
+    assertEqual(dependencies.length, 0, "Dependencies not supported");
+    exports = constructor();
+  };
+  global.define.amd = true;
+  globalEval(source);
+  delete global.define;
+  return exports;
 }
 
 type CellId = number | string;
