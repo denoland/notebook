@@ -77,8 +77,8 @@ export class Router extends Component<any, RouterState> {
   constructor(props) {
     super(props);
     this.state = {
-      userInfo: null,
       loadingAuth: true,
+      userInfo: null,
     };
   }
 

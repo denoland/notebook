@@ -18,72 +18,12 @@ import {
   test,
 } from "../tools/tester";
 import * as fetch from "./fetch";
-import {
-  assert,
-  IS_WEB,
-  nodeRequire,
-  process,
-  URL,
-} from "./util";
-
-const mnistPath = "/data/mnist/t10k-images-idx3-ubyte.bin";
+import { assertEqual } from "./util";
 
 test(async function fetch_fetchArrayBuffer() {
   await localServer(async function(url: string) {
-    url += mnistPath;
+    url += "/img/runButton.svg";
     const ab = await fetch.fetchArrayBuffer(url);
-    assert(ab.byteLength === 7840016);
+    assertEqual(ab.byteLength, 138);
   });
-});
-
-test(async function fetch_relativeWithSpacesNode() {
-  if (IS_WEB) return;
-  const origDir = process.cwd();
-  try {
-    // chdir to propel root, so we can test relative access.
-    process.chdir(__dirname + "/..");
-    const ab = await fetch.fetchArrayBuffer(
-      "src/testdata/dir with spaces/hello.txt");
-    assert(ab.byteLength === 7);
-  } finally {
-    process.chdir(origDir);
-  }
-});
-
-test(function fetch_resolve() {
-  // When in testing mode, MNIST should resolve to local paths.
-  const p = "http://propelml.org" + mnistPath;
-  let actual = fetch.resolve(p, true).toString();
-  let expected: string;
-  if (IS_WEB) {
-    expected = document.location.origin +
-      "/data/mnist/t10k-images-idx3-ubyte.bin";
-  } else {
-    const expectedURL = new URL("file:///");
-    expectedURL.pathname = nodeRequire("path").resolve(__dirname,
-      "../build/dev_website" + mnistPath);
-    expected = expectedURL.toString();
-  }
-  assert(actual === expected);
-  // When not in testing mode, the URL shouldn't be modified.
-  actual = fetch.resolve(p, false).toString();
-  expected = p;
-  assert(actual === expected);
-});
-
-test(function fetch_resolveRelativeSpaces() {
-  const p = "relative/path/with spaces/file.npy";
-  const actual = fetch.resolve(p).toString();
-  let expected: string;
-  if (IS_WEB) {
-    const base = document.location.toString();
-    expected = (new URL(p, base)).toString();
-  } else {
-    const expectedURL = new URL("file:///");
-    expectedURL.pathname = nodeRequire("path").resolve(p);
-    expected = expectedURL.toString();
-  }
-  console.log("actual", actual);
-  console.log("expected", expected);
-  assert(actual === expected);
 });

@@ -25,7 +25,7 @@ import {
 type ElementLike = JSX.Element | string | null;
 type ElementList = ElementLike[];
 
-export class Inspector extends Component<InspectorData, void>{
+export class Inspector extends Component<InspectorData, {}> {
   private parents = new Set(); // Used for circular reference detection.
 
   private renderKey(d: ValueDescriptor,
