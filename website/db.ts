@@ -170,7 +170,8 @@ class DatabaseFB implements Database {
 
   async queryProfile(uid: string, limit: number): Promise<NbInfo[]> {
     lazyInit();
-    const query = nbCollection.where("owner.uid", "==", uid).limit(limit);
+    const query = nbCollection.orderBy("updated", "desc")
+      .where("owner.uid", "==", uid).limit(limit);
     const snapshots = await query.get();
     const out = [];
     snapshots.forEach(snap => {
@@ -178,7 +179,7 @@ class DatabaseFB implements Database {
       const doc = snap.data();
       out.push({ nbId, doc });
     });
-    return out;
+    return out.reverse();
   }
 
   signIn() {
