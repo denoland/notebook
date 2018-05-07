@@ -1,7 +1,7 @@
 cache:
   directories:
    - .cache
-   - deps/node_modules/puppeteer/.local-chromium
+   - node_modules/
    - $HOME/.propel/cache
 branches:
   only:
@@ -14,7 +14,5 @@ git:
   submodules_depth: 1
 node_js:
 - '8.8'
-install: echo "Intentionally skipping npm install."
 script:
-- npm rebuild puppeteer
 - ./tools/presubmit.js

@@ -36,6 +36,7 @@ async function bundler(build) {
   run.symlink(run.root + "/src/testdata/", wdir + "src/testdata");
 
   const opts = {
+    autoinstall: false,
     cache: true,
     hmr: false,
     logLevel: process.env.CI ? 1 : null,
