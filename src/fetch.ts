@@ -99,6 +99,9 @@ async function fetchBrowserXHR(job: string, url: URL): Promise<ArrayBuffer> {
   req.responseType = "arraybuffer";
   req.send();
   await promise;
+  if (req.status !== 200) {
+    throw new Error(`Fetch failed: HTTP status ${req.status}`);
+  }
   return req.response;
 }
 
