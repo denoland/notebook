@@ -17,10 +17,9 @@
 const run = require("./run");
 const fs = require("fs");
 const Bundler = require("parcel-bundler");
-require("ts-node").register({ typeCheck: true });
 
+const buildFlag = process.argv.indexOf("build") >= 0;
 const prodFlag = process.argv.indexOf("prod") >= 0;
-exports.prodFlag = prodFlag;
 
 let wdir = "build/dev_website/";
 exports.wdir = wdir;
@@ -28,12 +27,8 @@ exports.wdir = wdir;
 async function bundler(build) {
   run.mkdir("build");
   run.mkdir(wdir);
-  run.mkdir(wdir + "src"); // Needed for npy_test
   run.symlink(run.root + "/src/", wdir + "static");
   run.symlink(run.root + "/src/img", wdir + "img");
-  run.symlink(run.root + "/deps/data/", wdir + "data");
-  // Needed for npy_test
-  run.symlink(run.root + "/src/testdata/", wdir + "src/testdata");
 
   const opts = {
     autoinstall: false,
@@ -59,13 +54,19 @@ async function bundler(build) {
 
 const port = 8080;
 async function devWebsiteServer(build = false) {
+  console.log("\n\n");
   const b = await bundler(build);
-  if (build) await b.bundle();
-  return await b.serve(port);
+  if (build) {
+    await b.bundle();
+  } else {
+    await b.serve(port);
+  }
 }
 exports.devWebsiteServer = devWebsiteServer;
 
 if (require.main === module) {
-  devWebsiteServer(false);
-  console.log(`Propel http://localhost:${port}/`);
+  if (!buildFlag) {
+    console.log(`Propel http://localhost:${port}/`);
+  }
+  devWebsiteServer(buildFlag);
 }
