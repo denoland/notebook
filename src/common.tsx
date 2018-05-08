@@ -17,7 +17,7 @@ export function PropelLogo(props) {
   if (props.subtitle) {
     Subtitle = (
       <h2>
-        <a href={ props.subtitleLink || "/" }>{ props.subtitle }</a>
+        <a href={props.subtitleLink || "/"}>{props.subtitle}</a>
       </h2>
     );
   }
@@ -25,20 +25,21 @@ export function PropelLogo(props) {
     <div class="propel-logo">
       <div class="logo">
         <svg
-          height={ 24 }
+          height={24}
           viewBox="0 0 24 24"
-          width={ 24 }
-          xmlns="http://www.w3.org/2000/svg" >
-          <circle cx={ 12 } cy={ 12 } r={ 12 } />
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx={12} cy={12} r={12} />
         </svg>
       </div>
       <div class="global-title">
         <div class="global-main-title">
-          <h1><a href="/">Propel</a></h1>
+          <h1>
+            <a href="/">Propel</a>
+          </h1>
         </div>
-        <div class="global-sub-title">
-          { Subtitle }
-        </div>
+        <div class="global-sub-title">{Subtitle}</div>
       </div>
     </div>
   );
@@ -61,11 +62,10 @@ export function GlobalHeader(props) {
       <div class="global-header">
         <div class="global-header-inner">
           <PropelLogo
-            subtitle={ props.subtitle }
-            subtitleLink={ props.subtitleLink } />
-          <div class="global-header-right">
-            { props.children }
-          </div>
+            subtitle={props.subtitle}
+            subtitleLink={props.subtitleLink}
+          />
+          <div class="global-header-right">{props.children}</div>
         </div>
       </div>
     </header>
@@ -76,26 +76,31 @@ export function UserMenu(props) {
   if (props.userInfo) {
     return (
       <div class="dropdown">
-        <Avatar size={ 32 } userInfo={ props.userInfo } />
+        <Avatar size={32} userInfo={props.userInfo} />
         <div class="dropdown-content">
-          <a href="#" onClick={ db.active.signOut } >
+          <a href="#" onClick={db.active.signOut}>
             Sign out
           </a>
         </div>
       </div>
     );
   }
-  return <a href="#" onClick={ db.active.signIn }>Sign in</a>;
+  return (
+    <a href="#" onClick={db.active.signIn}>
+      Sign in
+    </a>
+  );
 }
 
-export function Avatar(props: { size?: number, userInfo: db.UserInfo }) {
+export function Avatar(props: { size?: number; userInfo: db.UserInfo }) {
   const size = props.size || 50;
   return (
     <img
       class="avatar"
-      height={ size }
-      src={ props.userInfo.photoURL + "&size=" + size }
-      width={ size } />
+      height={size}
+      src={props.userInfo.photoURL + "&size=" + size}
+      width={size}
+    />
   );
 }
 
@@ -107,8 +112,8 @@ export function normalizeCode(code: string): string {
 export function UserTitle(props) {
   return (
     <div class="most-recent-header-title">
-      <Avatar userInfo={ props.userInfo } />
-      <h2>{ profileLink(props.userInfo) }</h2>
+      <Avatar userInfo={props.userInfo} />
+      <h2>{profileLink(props.userInfo)}</h2>
     </div>
   );
 }
@@ -120,8 +125,8 @@ export function docTitle(title: string): string {
 export function profileLink(u: db.UserInfo, text: string = null): JSX.Element {
   const href = window.location.origin + "/notebook/?profile=" + u.uid;
   return (
-    <a class="profile-link" href={ href } >
-      { text ? text : u.displayName }
+    <a class="profile-link" href={href}>
+      {text ? text : u.displayName}
     </a>
   );
 }

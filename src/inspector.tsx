@@ -28,21 +28,23 @@ type ElementList = ElementLike[];
 export class Inspector extends Component<InspectorData, {}> {
   private parents = new Set(); // Used for circular reference detection.
 
-  private renderKey(d: ValueDescriptor,
-                    arrayIndex: number | null = null): ElementList {
+  private renderKey(
+    d: ValueDescriptor,
+    arrayIndex: number | null = null
+  ): ElementList {
     switch (d.type) {
       case "string":
         const value = d.value;
         // Keys that look like javascript identifiers are rendered without
         // quote marks. Numerical keys can be omitted entirely.
         const isSimpleKey = /^[a-z$_][\w$_]*$/i.test(value);
-        const isArrayKey = (typeof arrayIndex === "number")
-                           && isNumericalKey(value);
+        const isArrayKey =
+          typeof arrayIndex === "number" && isNumericalKey(value);
         if (isArrayKey || isSimpleKey) {
           // 12: {...}
           // simple_key: {...}
           let elements = [
-            <span class="inspector__key cm-property">{ value }</span>,
+            <span class="inspector__key cm-property">{value}</span>,
             ": "
           ];
           // If the array keys are in the right order without holes, hide them
@@ -55,7 +57,7 @@ export class Inspector extends Component<InspectorData, {}> {
           // "my!weird*key\n": {...}
           return [
             <span class="inspector__key cm-string">
-              { JSON.stringify(value) }
+              {JSON.stringify(value)}
             </span>,
             ": "
           ];
@@ -64,7 +66,7 @@ export class Inspector extends Component<InspectorData, {}> {
         // [Symbol(some symbol)]: {...}
         return [
           "[",
-          <span class="inspector__key cm-property">{ d.value }</span>,
+          <span class="inspector__key cm-property">{d.value}</span>,
           "] :"
         ];
       default:
@@ -77,9 +79,9 @@ export class Inspector extends Component<InspectorData, {}> {
     // Render primitive values.
     switch (d.type) {
       case "boolean":
-        return [<span class="cm-atom">{ d.value }</span>];
+        return [<span class="cm-atom">{d.value}</span>];
       case "date":
-        return [<span class="cm-string-2">{ d.value }</span>];
+        return [<span class="cm-string-2">{d.value}</span>];
       case "getter":
         return [<span class="cm-keyword">[getter]</span>];
       case "gettersetter":
@@ -87,15 +89,15 @@ export class Inspector extends Component<InspectorData, {}> {
       case "null":
         return [<span class="cm-atom">null</span>];
       case "number":
-        return [<span class="cm-number">{ d.value }</span>];
+        return [<span class="cm-number">{d.value}</span>];
       case "regexp":
-        return [<span class="cm-string-2">{ d.value }</span>];
+        return [<span class="cm-string-2">{d.value}</span>];
       case "setter":
         return [<span class="cm-keyword">[setter]</span>];
       case "string":
-        return [<span class="cm-string">{ JSON.stringify(d.value) }</span>];
+        return [<span class="cm-string">{JSON.stringify(d.value)}</span>];
       case "symbol":
-        return [<span class="cm-string">{ d.value }</span>];
+        return [<span class="cm-string">{d.value}</span>];
       case "undefined":
         return [<span class="cm-atom">undefined</span>];
     }
@@ -112,17 +114,17 @@ export class Inspector extends Component<InspectorData, {}> {
 
     // Add regular array/object properties.
     const isArray = d.type === "array";
-    listItems.push(...d.props.map((prop, index) =>
-      this.renderProperty(prop, isArray ? index : null)
-    ));
+    listItems.push(
+      ...d.props.map((prop, index) =>
+        this.renderProperty(prop, isArray ? index : null)
+      )
+    );
     // Wrap the items in an <ul> element, but only if the list contains at
     // least one item.
     const list: ElementLike =
-      (listItems.length > 0)
-        ? <ul class="inspector__list inspector__prop-list">
-            { ...listItems }
-          </ul>
-        : null;
+      listItems.length > 0 ? (
+        <ul class="inspector__list inspector__prop-list">{listItems}</ul>
+      ) : null;
 
     // Render the object header, containing the class name, sometimes
     // some metadata between parentheses, and boxed primitive content.
@@ -135,8 +137,10 @@ export class Inspector extends Component<InspectorData, {}> {
         //   Array(3) [1, 2, 3, ...properties...]
         //   Float32Array(30) [...]
         let ctorElements = [
-          <span class="cm-def">{ d.ctor }</span>,
-          "(", <span class="cm-number">{ d.length }</span>, ") "
+          <span class="cm-def">{d.ctor}</span>,
+          "(",
+          <span class="cm-number">{d.length}</span>,
+          ") "
         ];
         if (d.ctor === "Array") {
           ctorElements = addClass(ctorElements, "inspector--show-if-expanded");
@@ -151,7 +155,7 @@ export class Inspector extends Component<InspectorData, {}> {
         //   Number:42 {...properties...}
         //   /abcd/i {...properties...}
         if (d.ctor !== "Date" && d.ctor !== "RegExp") {
-          elements.push(<span class="cm-def">{ d.ctor }</span>, ":");
+          elements.push(<span class="cm-def">{d.ctor}</span>, ":");
         }
         elements.push(
           ...this.renderValue(d.primitive),
@@ -165,16 +169,16 @@ export class Inspector extends Component<InspectorData, {}> {
         //   async function* bar()
         //   MyFunction:function baz()
         if (!/^(Async)?(Generator)?Function$/.test(d.ctor)) {
-          elements.push(<span class="cm-def">{ d.ctor }</span>, ":");
+          elements.push(<span class="cm-def">{d.ctor}</span>, ":");
         }
         elements.push(
           <span class="cm-keyword">
-            { d.async ? "async " : "" }
-            { d.class ? "class" : "function"}
-            { d.generator ? "*" : "" }
+            {d.async ? "async " : ""}
+            {d.class ? "class" : "function"}
+            {d.generator ? "*" : ""}
           </span>,
           d.name ? " " : "",
-          d.name ? <span class="cm-def">{ d.name }</span> : "",
+          d.name ? <span class="cm-def">{d.name}</span> : "",
           d.class ? "" : "()",
           ...this.renderPropListWithBraces(d, list)
         );
@@ -186,7 +190,7 @@ export class Inspector extends Component<InspectorData, {}> {
         //   {a: "hello", b: "world"}
         //   MyObject {"#^%&": "something"}
         if (d.ctor !== null && d.ctor !== "Object") {
-          elements.push(<span class="cm-def">{ d.ctor }</span>, " ");
+          elements.push(<span class="cm-def">{d.ctor}</span>, " ");
         }
         elements.push("{", list, "}");
         break;
@@ -198,17 +202,19 @@ export class Inspector extends Component<InspectorData, {}> {
     return elements;
   }
 
-  private renderPropListWithBraces(d: BaseObjectDescriptor,
-                                   list?: ElementLike): ElementList {
+  private renderPropListWithBraces(
+    d: BaseObjectDescriptor,
+    list?: ElementLike
+  ): ElementList {
     if (!list) return [];
     // If the list contains items that are visible in collapsed mode, always
     // show the curly braces. Otherwise show them only when expanded.
     const hasVisibleProps = d.props.some(prop => !prop.hidden);
     const braceClass = hasVisibleProps ? "" : "inspector--show-if-expanded";
     return [
-       ...addClass([" {"], braceClass),
-       list,
-       ...addClass(["}"], braceClass),
+      ...addClass([" {"], braceClass),
+      list,
+      ...addClass(["}"], braceClass)
     ];
   }
 
@@ -219,8 +225,13 @@ export class Inspector extends Component<InspectorData, {}> {
       return false;
     }
     // Objects can be expanded if they have properties.
-    if ((d.type === "array" || d.type === "box" || d.type === "function" ||
-         d.type === "object") && d.props.length > 0) {
+    if (
+      (d.type === "array" ||
+        d.type === "box" ||
+        d.type === "function" ||
+        d.type === "object") &&
+      d.props.length > 0
+    ) {
       return true;
     }
     return false;
@@ -230,22 +241,29 @@ export class Inspector extends Component<InspectorData, {}> {
     // Use a simple <a href="javascript:"> link, so it "just works" on pages
     // that have been pre-rendered into static html.
     const id = randomString();
-    return <a id={ id } class="inspector__toggle"
-              href={ `javascript:Inspector.toggle("${id}")` } />;
+    return (
+      <a
+        id={id}
+        class="inspector__toggle"
+        href={`javascript:Inspector.toggle("${id}")`}
+      />
+    );
   }
 
-  private renderProperty(prop: PropertyDescriptor,
-                         arrayIndex: number | null = null): ElementLike {
+  private renderProperty(
+    prop: PropertyDescriptor,
+    arrayIndex: number | null = null
+  ): ElementLike {
     const key = this.props.descriptors[prop.key];
     const value = this.props.descriptors[prop.value];
     const attr = { class: "inspector__li inspector__prop" };
     if (prop.hidden) attr.class += " inspector__prop--hidden";
     return (
-      <li { ...attr }>
-       { this.isExpandable(value) && this.renderExpandButton() }
-       <div class="inspector__content">
-          { ...this.renderKey(key, arrayIndex) }
-          { ...this.renderValue(value) }
+      <li {...attr}>
+        {this.isExpandable(value) && this.renderExpandButton()}
+        <div class="inspector__content">
+          {this.renderKey(key, arrayIndex)}
+          {this.renderValue(value)}
         </div>
       </li>
     );
@@ -253,53 +271,54 @@ export class Inspector extends Component<InspectorData, {}> {
 
   private renderRoot(): ElementLike {
     if (this.props.roots.length === 0) return "";
-     // Map root ids to descriptors.
+    // Map root ids to descriptors.
     const descriptors = this.props.descriptors;
     const roots = this.props.roots.map(id => descriptors[id]);
     // Count the number of items with children.
-    const rootsWithChildren = roots.map(d => +this.isExpandable(d))
-                                   .reduce((count, d) => count + d);
+    const rootsWithChildren = roots
+      .map(d => +this.isExpandable(d))
+      .reduce((count, d) => count + d);
     let rootElement: ElementLike;
     if (rootsWithChildren <= 1) {
       // With at most one expandable item, place all roots in a single div.
-      const elements = [].concat(...roots.map((d, index) => [
-        index > 0 ? " " : "", // Space between items.
-        ...this.renderValue(d)
-      ]));
-      rootElement = <div class="inspector__content">{ ...elements }</div>;
+      const elements = [].concat(
+        ...roots.map((d, index) => [
+          index > 0 ? " " : "", // Space between items.
+          ...this.renderValue(d)
+        ])
+      );
+      rootElement = <div class="inspector__content">{elements}</div>;
     } else {
       // With more than one expandable root, place all of them in a separate.
       // list item.
-      const listItems = roots.map(d =>
+      const listItems = roots.map(d => (
         <li class="inspector__li inspector__root">
-          { this.isExpandable(d) && this.renderExpandButton() }
-          <div class="inspector__content">
-            { ...this.renderValue(d) }
-          </div>
+          {this.isExpandable(d) && this.renderExpandButton()}
+          <div class="inspector__content">{this.renderValue(d)}</div>
         </li>
-      );
-      rootElement =
+      ));
+      rootElement = (
         <div class="inspector__content">
-          <ul class="inspector__list">
-            { ...listItems }
-          </ul>
-        </div>;
+          <ul class="inspector__list">{listItems}</ul>
+        </div>
+      );
     }
     // If there are expandable items, add a top-level expand button.
     if (rootsWithChildren > 0) {
-      rootElement =
+      rootElement = (
         <ul class="inspector__list">
           <li class="inspector__li">
-            { this.renderExpandButton() }
-            { rootElement }
+            {this.renderExpandButton()}
+            {rootElement}
           </li>
-        </ul>;
+        </ul>
+      );
     }
     return rootElement;
   }
 
   render(): JSX.Element {
-    return <div class="inspector cm-s-syntax">{ this.renderRoot() }</div>;
+    return <div class="inspector cm-s-syntax">{this.renderRoot()}</div>;
   }
 
   static toggle(id: string): void {
@@ -313,7 +332,10 @@ export class Inspector extends Component<InspectorData, {}> {
 // The element list may contain strings; they are converted to spans.
 function addClass(elements: ElementList, classes: string): ElementList {
   // Remove redundant whitespace from classes.
-  classes = classes.split(/\s+/).filter(s => s !== "").join();
+  classes = classes
+    .split(/\s+/)
+    .filter(s => s !== "")
+    .join();
   // Return early when no classes are added.
   if (classes === "") return elements;
   const result: ElementList = [];
@@ -327,7 +349,7 @@ function addClass(elements: ElementList, classes: string): ElementList {
     } else {
       if (stringBuffer) {
         // Wrap the buffered-up string in a <span> element and flush.
-        result.push(<span class={ classes }>{ stringBuffer }</span>);
+        result.push(<span class={classes}>{stringBuffer}</span>);
         stringBuffer = "";
       }
       // Add our css class to the existing element.
@@ -337,7 +359,7 @@ function addClass(elements: ElementList, classes: string): ElementList {
     }
   }
   if (stringBuffer) {
-    result.push(<span class={ classes }>{ stringBuffer }</span>);
+    result.push(<span class={classes}>{stringBuffer}</span>);
   }
   return result;
 }

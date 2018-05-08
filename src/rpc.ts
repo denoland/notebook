@@ -149,8 +149,9 @@ export abstract class RPCBase implements RPC {
       let { exception } = message;
       if (exception.__error__) {
         // Convert to Error object.
-        exception = Object.assign(new Error(exception.message),
-                                  { stack: exception.stack });
+        exception = Object.assign(new Error(exception.message), {
+          stack: exception.stack
+        });
       }
       resolver.reject(exception);
     } else {
@@ -165,17 +166,15 @@ export class WindowRPC extends RPCBase {
   }
 
   protected send(message: Message) {
-    this.remote.postMessage(
-        { rpcChannelId: this.channelId, ...message }, "*");
+    this.remote.postMessage({ rpcChannelId: this.channelId, ...message }, "*");
   }
 
   // Use an arrow function to make this function have a bound `this`.
   private receive = (ev: MessageEvent) => {
-    if (ev.data instanceof Object &&
-        ev.data.rpcChannelId === this.channelId) {
+    if (ev.data instanceof Object && ev.data.rpcChannelId === this.channelId) {
       super.onMessage(ev.data);
     }
-  }
+  };
 
   start(handlers: RpcHandlers): void {
     super.start(handlers);
@@ -202,7 +201,7 @@ export class WebSocketRPC extends RPCBase {
   private receive = (ev: MessageEvent): void => {
     const message: Message = JSON.parse(ev.data);
     super.onMessage(message);
-  }
+  };
 
   start(handlers: RpcHandlers): void {
     super.start(handlers);

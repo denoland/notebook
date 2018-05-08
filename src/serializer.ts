@@ -23,8 +23,8 @@ export interface PrimitiveDescriptor {
   value: string;
 }
 export interface BaseObjectDescriptor {
-  ctor: string | null;            // Name of the object's constructor.
-  props: PropertyDescriptor[];    // Descriptors for object properties.
+  ctor: string | null; // Name of the object's constructor.
+  props: PropertyDescriptor[]; // Descriptors for object properties.
 }
 export interface ArrayDescriptor extends BaseObjectDescriptor {
   type: "array";
@@ -47,10 +47,16 @@ export interface ObjectDescriptor extends BaseObjectDescriptor {
 
 export type ValueDescriptor =
   // TODO: add Maps and Sets.
-  AtomDescriptor | PrimitiveDescriptor | ArrayDescriptor | BoxDescriptor |
-  ObjectDescriptor | FunctionDescriptor;
+  | AtomDescriptor
+  | PrimitiveDescriptor
+  | ArrayDescriptor
+  | BoxDescriptor
+  | ObjectDescriptor
+  | FunctionDescriptor;
 export type DescriptorRef = number;
-export interface DescriptorSet { [id: number]: ValueDescriptor; }
+export interface DescriptorSet {
+  [id: number]: ValueDescriptor;
+}
 
 export interface PropertyDescriptor {
   key: DescriptorRef;
@@ -77,8 +83,8 @@ class Placeholder {
 }
 
 // tslint:disable:variable-name
-const AsyncFunction = (async function() {}).constructor;
-const GeneratorFunction = (function*() {}).constructor;
+const AsyncFunction = async function() {}.constructor;
+const GeneratorFunction = function*() {}.constructor;
 const TypedArray = Object.getPrototypeOf(Int32Array);
 // tslint:enable:variable-name
 
@@ -168,8 +174,12 @@ class DescriptionBuilder {
     for (const key of keys) {
       const descriptor = Object.getOwnPropertyDescriptor(value, key);
       // For strings, skip numeric keys that point at a character in the string.
-      if (valueIsBoxedString && typeof key === "string" &&
-          isNumericalKey(key) && Number(key) < value.length) {
+      if (
+        valueIsBoxedString &&
+        typeof key === "string" &&
+        isNumericalKey(key) &&
+        Number(key) < value.length
+      ) {
         continue;
       }
       // Set the 'hidden' flag for non-enumerable properties, as well as a few
@@ -183,8 +193,8 @@ class DescriptionBuilder {
       // attempt to read the property value, since this may have side effects.
       if (descriptor.get || descriptor.set) {
         // `type` becomes either "getter", "setter", or "gettersetter".
-        const type = (descriptor.get ? "getter" : "") +
-                     (descriptor.set ? "setter" : "");
+        const type =
+          (descriptor.get ? "getter" : "") + (descriptor.set ? "setter" : "");
         d.props.push({
           key: this.describe(key),
           value: this.describe(Placeholder[type]),
@@ -218,18 +228,24 @@ class DescriptionBuilder {
         async: value instanceof AsyncFunction,
         class: /^class\s/.test(value),
         generator: value instanceof GeneratorFunction,
-        ...d,
+        ...d
       } as FunctionDescriptor;
-    } else if ((value instanceof Array || value instanceof TypedArray) &&
-              succeeds(() => value.length)) {
+    } else if (
+      (value instanceof Array || value instanceof TypedArray) &&
+      succeeds(() => value.length)
+    ) {
       // Array-like object (with a magic length property).
       return {
         type: "array",
         length: value.length,
         ...d
       } as ArrayDescriptor;
-    } else if ((value instanceof Boolean || value instanceof Number ||
-              value instanceof String) && succeeds(() => value.valueOf())) {
+    } else if (
+      (value instanceof Boolean ||
+        value instanceof Number ||
+        value instanceof String) &&
+      succeeds(() => value.valueOf())
+    ) {
       // This is a box object as they are created by e.g. `new Number(3)`.
       const p = this.createDescriptor(value.valueOf());
       return {
@@ -249,7 +265,7 @@ class DescriptionBuilder {
       return {
         type: "box",
         primitive: { type: "regexp", value: String(value) },
-        ...d,
+        ...d
       } as BoxDescriptor;
     } else {
       // Regular or other type of object.
@@ -261,12 +277,14 @@ class DescriptionBuilder {
 // This function "describes" any javascript object for the purpose of
 // inspection/pretty printing. The returned descriptor object can be
 // serialized (e.g. using JSON) and sent to a different javascript context.
-export function describe(values: any[],
-                         options?: InspectorOptions): InspectorData {
+export function describe(
+  values: any[],
+  options?: InspectorOptions
+): InspectorData {
   const builder = new DescriptionBuilder(options);
   const roots = values.map(v => builder.describe(v));
   return {
     roots,
-    descriptors: builder.getDescriptors(),
+    descriptors: builder.getDescriptors()
   };
 }

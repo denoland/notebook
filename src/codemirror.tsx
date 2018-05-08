@@ -29,7 +29,7 @@ const defaultOptions = {
   mode: "javascript",
   scrollbarStyle: null,
   theme: "syntax",
-  viewportMargin: Infinity,
+  viewportMargin: Infinity
 };
 
 export interface CodeMirrorProps {
@@ -42,16 +42,19 @@ export interface CodeMirrorProps {
   onChange?: (code: string) => void;
   id?: string;
 }
-export interface CodeMirrorState { }
+export interface CodeMirrorState {}
 
-export class CodeMirrorComponent extends
-    Component<CodeMirrorProps, CodeMirrorState> {
+export class CodeMirrorComponent extends Component<
+  CodeMirrorProps,
+  CodeMirrorState
+> {
   editor: CodeMirror.Editor;
   pre: Element;
 
   get code(): string {
-    return normalizeCode(this.editor ? this.editor.getValue()
-                                     : this.props.code);
+    return normalizeCode(
+      this.editor ? this.editor.getValue() : this.props.code
+    );
   }
 
   // Because CodeMirror has a lot of state that is not managed through
@@ -79,7 +82,7 @@ export class CodeMirrorComponent extends
   componentDidMount() {
     const options = Object.assign({}, defaultOptions, {
       mode: "javascript",
-      value: this.code,
+      value: this.code
     });
 
     // tslint:disable-next-line:variable-name
@@ -98,11 +101,10 @@ export class CodeMirrorComponent extends
       return;
     }
 
-    this.editor =
-      CodeMirror(div => {
-        parentEl.replaceChild(div, pre);
-        if (id) codeMirrorElements.set(id, div);
-      }, options);
+    this.editor = CodeMirror(div => {
+      parentEl.replaceChild(div, pre);
+      if (id) codeMirrorElements.set(id, div);
+    }, options);
     this.editor.setOption("extraKeys", {
       "Alt-Enter": () => {
         if (this.props.onAltEnter) this.props.onAltEnter();
@@ -115,7 +117,7 @@ export class CodeMirrorComponent extends
       "Shift-Enter": () => {
         if (this.props.onShiftEnter) this.props.onShiftEnter();
         return true;
-      },
+      }
     });
 
     this.editor.on("focus", () => {
@@ -133,7 +135,13 @@ export class CodeMirrorComponent extends
 
   render() {
     return (
-      <pre ref={ ref => { this.pre = ref; } }>{ this.code }</pre>
+      <pre
+        ref={ref => {
+          this.pre = ref;
+        }}
+      >
+        {this.code}
+      </pre>
     );
   }
 }

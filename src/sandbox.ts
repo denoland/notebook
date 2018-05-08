@@ -35,8 +35,9 @@ let lastExecutedCellId: CellId = null;
 
 const transpiler = new Transpiler();
 
-const channelId =
-    document.querySelector("meta[name=rpc-channel-id]").getAttribute("content");
+const channelId = document
+  .querySelector("meta[name=rpc-channel-id]")
+  .getAttribute("content");
 const rpc: RPC = new WindowRPC(window.parent, channelId);
 rpc.start({ runCell });
 
@@ -71,7 +72,7 @@ function guessCellId(error?: Error): number | string {
 }
 
 class Console {
-  constructor(private rpc: RPC, private cellId: number | string) { }
+  constructor(private rpc: RPC, private cellId: number | string) {}
 
   private print(data: InspectorData) {
     this.rpc.call("print", this.cellId, data);

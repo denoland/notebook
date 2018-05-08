@@ -69,7 +69,7 @@
     "radix": true,
     // https://github.com/buzinas/tslint-eslint-rules/issues/318
     // "space-before-blocks": true,
-    "space-before-function-paren": [true, "never"],
+    "space-before-function-paren": false,
     "semicolon": [true, "always", "ignore-bound-class-methods"],
     //"switch-default": true,
     "triple-equals": [true, "allow-null-check"],

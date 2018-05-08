@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 const run = require("./run");
 
-process.on("unhandledRejection", e => { throw e; });
+process.on("unhandledRejection", e => {
+  throw e;
+});
 
-(async() => {
+(async () => {
   run.sh("node tools/build.js");
 
   // Web browser tests

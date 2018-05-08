@@ -140,7 +140,7 @@ global.it = function it(name: string, fn: (done?: DoneFn) => void): void {
   const isAsync = fn.length > 0;
   name = `${suite.name}: ${name}`;
 
-  const wrapper = async() => {
+  const wrapper = async () => {
     callHooks(suite.before);
     try {
       if (isAsync) {

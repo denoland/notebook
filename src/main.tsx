@@ -8,7 +8,7 @@ assert(IS_WEB);
 
 enableFirebase();
 
-window.addEventListener("load", async() => {
+window.addEventListener("load", async () => {
   render(<Router />, document.body, document.body.children[0]);
   await drainExecuteQueue();
 

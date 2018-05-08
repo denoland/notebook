@@ -13,12 +13,7 @@
    limitations under the License.
  */
 
-import {
-  assert,
-  global,
-  IS_NODE,
-  nodeRequire,
-} from "../src/util";
+import { assert, global, IS_NODE, nodeRequire } from "../src/util";
 
 // There are a few situations where we would like to branch based on if its a
 // test environment, particularly when it comes to datasets. We'd rather use
@@ -102,12 +97,7 @@ async function runTests() {
 
   for (let i = 0; i < tests.length; i++) {
     const { fn, name } = tests[i];
-    log("%d/%d +%d -%d: %s",
-        i + 1,
-        tests.length,
-        passed,
-        failed,
-        name);
+    log("%d/%d +%d -%d: %s", i + 1, tests.length, passed, failed, name);
     try {
       await fn();
       passed++;
@@ -147,8 +137,11 @@ export async function localServer(
   } else {
     const root = __dirname + "/../build/dev_website";
     const { isDir } = require("../src/util_node");
-    assert(isDir(root), root +
-      " does not exist. Run ./tools/dev_website before running this test.");
+    assert(
+      isDir(root),
+      root +
+        " does not exist. Run ./tools/dev_website before running this test."
+    );
     const { createServer } = nodeRequire("http-server");
     const server = createServer({ cors: true, root });
     server.listen();

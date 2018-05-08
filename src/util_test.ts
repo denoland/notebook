@@ -25,10 +25,18 @@ test(async function util_equal() {
   assert(util.equal(NaN, NaN));
   assert(util.equal({ hello: "world" }, { hello: "world" }));
   assert(!util.equal({ world: "hello" }, { hello: "world" }));
-  assert(util.equal({ hello: "world", hi: { there: "everyone" } },
-                    { hello: "world", hi: { there: "everyone" } }));
-  assert(!util.equal({ hello: "world", hi: { there: "everyone" } },
-                    { hello: "world", hi: { there: "everyone else" } }));
+  assert(
+    util.equal(
+      { hello: "world", hi: { there: "everyone" } },
+      { hello: "world", hi: { there: "everyone" } }
+    )
+  );
+  assert(
+    !util.equal(
+      { hello: "world", hi: { there: "everyone" } },
+      { hello: "world", hi: { there: "everyone else" } }
+    )
+  );
 });
 
 test(async function util_counterMap() {
@@ -104,8 +112,10 @@ test(async function util_formatImageName() {
   assertEqual(util.formatImageName("a", 1), "a-1.png");
   assertEqual(util.formatImageName("a.jpg", 2), "a-2.jpg");
   assertEqual(util.formatImageName("a.jpeg", 3), "a-3.jpeg");
-  assertEqual(util.formatImageName("name with spaces and /@!#$", 2),
-    "name with spaces and /@!#$-2.png");
+  assertEqual(
+    util.formatImageName("name with spaces and /@!#$", 2),
+    "name with spaces and /@!#$-2.png"
+  );
   const name = util.formatImageName(undefined, 5);
   assert(name.startsWith("propel-"));
   assert(name.endsWith("-5.png"));

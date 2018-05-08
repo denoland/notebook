@@ -34,13 +34,14 @@ export function renderPage(p: Page): void {
 export let firebaseUrls = [
   "https://www.gstatic.com/firebasejs/4.9.0/firebase.js",
   "https://www.gstatic.com/firebasejs/4.9.0/firebase-auth.js",
-  "https://www.gstatic.com/firebasejs/4.9.0/firebase-firestore.js",
+  "https://www.gstatic.com/firebasejs/4.9.0/firebase-firestore.js"
 ];
 
 // Called by tools/build_website.ts
 export function getHTML(title, markup) {
-  const scriptTags = firebaseUrls.map(u =>
-    `<script src="${u}"></script>`).join("\n");
+  const scriptTags = firebaseUrls
+    .map(u => `<script src="${u}"></script>`)
+    .join("\n");
   return `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -78,13 +79,13 @@ export class Router extends Component<any, RouterState> {
     super(props);
     this.state = {
       loadingAuth: true,
-      userInfo: null,
+      userInfo: null
     };
   }
 
   unsubscribe: db.UnsubscribeCb;
   componentWillMount() {
-    this.unsubscribe = db.active.subscribeAuthChange((userInfo) => {
+    this.unsubscribe = db.active.subscribeAuthChange(userInfo => {
       this.setState({ loadingAuth: false, userInfo });
     });
   }
@@ -115,12 +116,12 @@ export const pages: Page[] = [
     title: "Propel ML",
     path: "index.html",
     root: PropelIndex,
-    route: /^\/(index.html)?$/,
+    route: /^\/(index.html)?$/
   },
   {
     title: "Propel Notebook",
     path: "notebook/index.html",
     root: nb.NotebookRoot,
-    route: /^\/notebook/,
-  },
+    route: /^\/notebook/
+  }
 ];

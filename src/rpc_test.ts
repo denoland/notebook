@@ -1,8 +1,4 @@
-import {
-  assertEqual,
-  IS_NODE,
-  nodeRequire
-} from "../src/util";
+import { assertEqual, IS_NODE, nodeRequire } from "../src/util";
 import { test } from "../tools/tester";
 import { RPC, WebSocketRPC } from "./rpc";
 
@@ -10,7 +6,7 @@ type ChannelInfo = { rpc1: RPC; rpc2: RPC; cleanup: () => void };
 let makeChannel: () => Promise<ChannelInfo>;
 
 if (IS_NODE) {
-  makeChannel = async(): Promise<ChannelInfo> => {
+  makeChannel = async (): Promise<ChannelInfo> => {
     // tslint:disable-next-line:variable-name
     const WebSocket = nodeRequire("ws");
     const server = new WebSocket.Server({ host: `127.0.0.1`, port: 0 });
@@ -52,8 +48,8 @@ if (IS_NODE) {
       }
     });
     rpc2.start({});
-    assertEqual((await rpc2.call("getNumber")), 3.14);
-    assertEqual((await rpc2.call("getString")), "hello");
+    assertEqual(await rpc2.call("getNumber"), 3.14);
+    assertEqual(await rpc2.call("getString"), "hello");
     assertEqual(await rpc2.call("getObject"), { i: "am an object" });
     assertEqual(await rpc2.call("getArray"), [1, 2, 3]);
     rpc1.stop();
@@ -81,13 +77,12 @@ if (IS_NODE) {
         return val;
       }
     });
-    assertEqual((await rpc1.call("addTwo", 0)), 42);
-    assertEqual((await rpc2.call("addOne", 0)), 42);
+    assertEqual(await rpc1.call("addTwo", 0), 42);
+    assertEqual(await rpc2.call("addOne", 0), 42);
     rpc1.stop();
     rpc2.stop();
     cleanup();
   });
-
 } else {
   // TODO: how to test this on the web?
 }

@@ -44,10 +44,10 @@ const anonDoc = {
   owner: {
     displayName: "Anonymous",
     photoURL: "/static/img/anon_profile.png?",
-    uid: "",
+    uid: ""
   },
   title: "Anonymous Notebook",
-  updated: new Date(),
+  updated: new Date()
 };
 
 export interface FixedProps {
@@ -63,7 +63,7 @@ export class FixedCell extends Component<FixedProps, {}> {
     return (
       <div class="notebook-cell">
         <div class="input">
-          <pre>{ normalizeCode(this.props.code) }</pre>
+          <pre>{normalizeCode(this.props.code)}</pre>
         </div>
       </div>
     );
@@ -97,8 +97,10 @@ export interface NotebookRootState {
   errorMsg?: string;
 }
 
-export class NotebookRoot extends Component<NotebookRootProps,
-                                            NotebookRootState> {
+export class NotebookRoot extends Component<
+  NotebookRootProps,
+  NotebookRootState
+> {
   notebookRef?: Notebook; // Hook for testing.
   isCloningInProgress: boolean;
 
@@ -128,16 +130,13 @@ export class NotebookRoot extends Component<NotebookRootProps,
       if (nbId) {
         // nbId specified. Query the the notebook.
         const doc = await (nbId === "anonymous"
-                           ? Promise.resolve(anonDoc)
-                           : db.active.getDoc(nbId));
+          ? Promise.resolve(anonDoc)
+          : db.active.getDoc(nbId));
         this.setState({ doc });
-
       } else if (profileUid) {
         // profileUid specified. Query the profile.
-        const profileLatest =
-          await db.active.queryProfile(profileUid, 100);
+        const profileLatest = await db.active.queryProfile(profileUid, 100);
         this.setState({ profileLatest });
-
       } else {
         // Neither specified. Show the most-recent.
         // TODO potentially these two queries can be combined into one.
@@ -151,8 +150,12 @@ export class NotebookRoot extends Component<NotebookRootProps,
 
   async componentDidUpdate() {
     // Call the onReady callback for testing.
-    if (this.state.errorMsg || this.state.mostRecent ||
-        this.state.profileLatest || this.state.doc) {
+    if (
+      this.state.errorMsg ||
+      this.state.mostRecent ||
+      this.state.profileLatest ||
+      this.state.doc
+    ) {
       if (this.props.onReady) this.props.onReady();
     }
   }
@@ -185,43 +188,44 @@ export class NotebookRoot extends Component<NotebookRootProps,
         <div class="notification-screen">
           <div class="notebook-container">
             <p class="error-header">Error</p>
-            <p>{ this.state.errorMsg }</p>
+            <p>{this.state.errorMsg}</p>
           </div>
         </div>
       );
     } else if (this.state.profileLatest) {
       body = (
         <Profile
-          profileLatest={ this.state.profileLatest }
-          userInfo={ this.props.userInfo } />
+          profileLatest={this.state.profileLatest}
+          userInfo={this.props.userInfo}
+        />
       );
-
     } else if (this.state.doc) {
       body = (
         <Notebook
-          save={ this.handleNotebookSave.bind(this) }
-          clone={ this.handleNotebookClone.bind(this) }
-          initialDoc={ this.state.doc }
-          ref={ ref => this.notebookRef = ref }
-          userInfo={ this.props.userInfo } />
+          save={this.handleNotebookSave.bind(this)}
+          clone={this.handleNotebookClone.bind(this)}
+          initialDoc={this.state.doc}
+          ref={ref => (this.notebookRef = ref)}
+          userInfo={this.props.userInfo}
+        />
       );
     } else if (this.state.mostRecent) {
       body = (
         <MostRecent
-          mostRecent={ this.state.mostRecent }
-          userInfo={ this.props.userInfo } />
+          mostRecent={this.state.mostRecent}
+          userInfo={this.props.userInfo}
+        />
       );
-
     } else {
       body = <Loading />;
     }
 
     return (
       <div class="notebook">
-        <GlobalHeader subtitle="Notebook" subtitleLink="/notebook" >
-          <UserMenu userInfo={ this.props.userInfo } />
+        <GlobalHeader subtitle="Notebook" subtitleLink="/notebook">
+          <UserMenu userInfo={this.props.userInfo} />
         </GlobalHeader>
-        { body }
+        {body}
       </div>
     );
   }
@@ -232,7 +236,7 @@ export interface MostRecentProps {
   userInfo?: db.UserInfo;
 }
 
-export interface MostRecentState { }
+export interface MostRecentState {}
 
 export class MostRecent extends Component<MostRecentProps, MostRecentState> {
   render() {
@@ -242,25 +246,21 @@ export class MostRecent extends Component<MostRecentProps, MostRecentState> {
       // break between the link to "Your Notebooks" and "Most Recent".
       profileLinkEl = (
         <div class="most-recent-header">
-          <h2>{ profileLink(this.props.userInfo, "Your Notebooks") }</h2>
+          <h2>{profileLink(this.props.userInfo, "Your Notebooks")}</h2>
         </div>
       );
     }
 
     return (
       <div class="most-recent">
-        { profileLinkEl }
+        {profileLinkEl}
         <div class="most-recent-header">
           <div class="most-recent-header-title">
             <h2>Recently Updated</h2>
           </div>
-          <div class="most-recent-header-cta">
-            { newNotebookButton() }
-          </div>
+          <div class="most-recent-header-cta">{newNotebookButton()}</div>
         </div>
-        <ol>
-          { ...notebookList(this.props.mostRecent) }
-        </ol>
+        <ol>{notebookList(this.props.mostRecent)}</ol>
       </div>
     );
   }
@@ -270,11 +270,12 @@ function newNotebookButton() {
   return (
     <button
       class="create-notebook"
-      onClick={async() => {
+      onClick={async () => {
         // Redirect to new notebook.
         const nbId = await db.active.create();
         window.location.href = nbUrl(nbId);
-      }} >
+      }}
+    >
       + New Notebook
     </button>
   );
@@ -285,7 +286,7 @@ export interface ProfileProps {
   userInfo?: db.UserInfo;
 }
 
-export interface ProfileState { }
+export interface ProfileState {}
 
 export class Profile extends Component<ProfileProps, ProfileState> {
   render() {
@@ -300,14 +301,14 @@ export class Profile extends Component<ProfileProps, ProfileState> {
     return (
       <div class="most-recent">
         <div class="most-recent-header">
-          <UserTitle userInfo={ doc.owner } />
-          { newNotebookButton() }
+          <UserTitle userInfo={doc.owner} />
+          {newNotebookButton()}
         </div>
         <ol>
-          {...notebookList(this.props.profileLatest, {
+          {notebookList(this.props.profileLatest, {
             showDates: false,
             showName: false,
-            showTitle: true,
+            showTitle: true
           })}
         </ol>
       </div>
@@ -315,59 +316,51 @@ export class Profile extends Component<ProfileProps, ProfileState> {
   }
 }
 
-function notebookList(notebooks: db.NbInfo[], {
-  showName = true,
-  showTitle = false,
-  showDates = false,
-} = {}): JSX.Element[] {
+function notebookList(
+  notebooks: db.NbInfo[],
+  { showName = true, showTitle = false, showDates = false } = {}
+): JSX.Element[] {
   return notebooks.map(info => {
     const snippit = db.getInputCodes(info.doc).join("\n\n");
     const href = nbUrl(info.nbId);
     return (
-      <a href={ href } >
+      <a href={href}>
         <li>
-            <div class="code-snippit">{ snippit }</div>
-            { notebookBlurb(info.doc, { showName, showTitle, showDates }) }
+          <div class="code-snippit">{snippit}</div>
+          {notebookBlurb(info.doc, { showName, showTitle, showDates })}
         </li>
       </a>
     );
   });
 }
 
-function notebookBlurb(doc: db.NotebookDoc, {
-  showName = true,
-  showTitle = false,
-  showDates = false,
-} = {}): JSX.Element {
+function notebookBlurb(
+  doc: db.NotebookDoc,
+  { showName = true, showTitle = false, showDates = false } = {}
+): JSX.Element {
   let body = [];
   if (showDates) {
     body = body.concat([
       <div class="date-created">
-        <p class="created">
-          Created { fmtDate(doc.created) }
-        </p>
+        <p class="created">Created {fmtDate(doc.created)}</p>
       </div>,
       <div class="date-updated">
-        <p class="updated">
-          Updated { fmtDate(doc.updated) }
-        </p>
+        <p class="updated">Updated {fmtDate(doc.updated)}</p>
       </div>
     ]);
   }
   if (showName) {
     body = body.concat([
       <div class="blurb-avatar">
-        <Avatar userInfo={ doc.owner } />
+        <Avatar userInfo={doc.owner} />
       </div>,
-      <p class="blurb-name">
-        { doc.owner.displayName }
-      </p>
+      <p class="blurb-name">{doc.owner.displayName}</p>
     ]);
   }
   if (showTitle) {
-    body.push(<p class="blurb-title">{ docTitle(doc.title) }</p>);
+    body.push(<p class="blurb-title">{docTitle(doc.title)}</p>);
   }
-  return <div class="blurb">{ ...body }</div>;
+  return <div class="blurb">{body}</div>;
 }
 
 function fmtDate(d: Date): string {

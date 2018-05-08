@@ -11,7 +11,7 @@ const DOC_TITLE = "Anonymous Notebook";
 testBrowser(async function notebook_NotebookRoot() {
   const mdb = db.enableMock();
   resetPage();
-  const el = h(nb.NotebookRoot, { });
+  const el = h(nb.NotebookRoot, {});
   render(el, document.body);
   await flush();
   assertEqual(mdb.counts, { queryLatest: 1 });
@@ -56,8 +56,9 @@ testBrowser(async function notebook_progressBar() {
   const notebook = await renderNotebook();
   const cellIds = notebook.state.order;
 
-  const progressBar =
-      document.querySelector(".notebook-cell .progress-bar") as HTMLElement;
+  const progressBar = document.querySelector(
+    ".notebook-cell .progress-bar"
+  ) as HTMLElement;
   assert(progressBar != null);
 
   // tslint:disable-next-line:ban
@@ -65,12 +66,14 @@ testBrowser(async function notebook_progressBar() {
   const visible = () => progressBar.style.display === "block";
 
   // Call util.downloadProgress in the notebook sandbox.
-  const downloadProgress = async(job, loaded, total, cellNo = 1) => {
+  const downloadProgress = async (job, loaded, total, cellNo = 1) => {
     const cellId = cellIds[cellNo - 1];
     const vm = notebook.vm;
-    await vm.exec(`import { downloadProgress } from "test_internals";
+    await vm.exec(
+      `import { downloadProgress } from "test_internals";
        await downloadProgress(...${JSON.stringify([job, loaded, total])});`,
-       cellId);
+      cellId
+    );
     await flush();
   };
 
@@ -112,7 +115,7 @@ testBrowser(async function notebook_progressBar() {
 });
 
 testBrowser(async function notebook_title() {
-  const currentTitle = document.title = "Propel Tests";
+  const currentTitle = (document.title = "Propel Tests");
   await renderNotebook();
   assertEqual(document.title, `${currentTitle} | ${DOC_TITLE}`);
 });
@@ -173,7 +176,7 @@ function renderProfile(profileUid: string) {
   resetPage();
   const el = h(nb.NotebookRoot, {
     onReady: promise.resolve,
-    profileUid,
+    profileUid
   });
   render(el, document.body);
   return promise;
@@ -186,7 +189,7 @@ async function renderAnonNotebook(): Promise<nb.NotebookRoot> {
   const el = h(nb.NotebookRoot, {
     nbId: "default",
     onReady: promise.resolve,
-    ref: n => notebookRoot = n
+    ref: n => (notebookRoot = n)
   });
   render(el, document.body);
   await promise;
@@ -205,12 +208,12 @@ async function renderNotebook(): Promise<Notebook> {
       owner: {
         displayName: "Anonymous",
         photoURL: "/static/img/anon_profile.png?",
-        uid: "",
+        uid: ""
       },
       title: DOC_TITLE,
-      updated: new Date(),
+      updated: new Date()
     },
-    ref: ref => notebook = ref
+    ref: ref => (notebook = ref)
   });
   render(nb, document.body);
   assert(!!notebook);

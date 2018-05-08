@@ -13,10 +13,7 @@
    limitations under the License.
  */
 
-import {
-  localServer,
-  test,
-} from "../tools/tester";
+import { localServer, test } from "../tools/tester";
 import * as fetch from "./fetch";
 import { assertEqual } from "./util";
 

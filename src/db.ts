@@ -49,7 +49,7 @@ export interface CellDoc {
 export interface NotebookDoc {
   anonymous?: boolean;
   cells?: string[];
-  cellDocs?: CellDoc[];  // Coming soon.
+  cellDocs?: CellDoc[]; // Coming soon.
   owner: UserInfo;
   title: string;
   updated: Date;
@@ -75,7 +75,7 @@ const firebaseConfig = {
   databaseURL: "https://propel-ml.firebaseio.com",
   messagingSenderId: "587486455356",
   projectId: "propel-ml",
-  storageBucket: "propel-ml.appspot.com",
+  storageBucket: "propel-ml.appspot.com"
 };
 
 class DatabaseFB implements Database {
@@ -102,7 +102,7 @@ class DatabaseFB implements Database {
     await docRef.update({
       cells: doc.cells,
       title: doc.title || "",
-      updated: firebase.firestore.FieldValue.serverTimestamp(),
+      updated: firebase.firestore.FieldValue.serverTimestamp()
     });
   }
 
@@ -124,12 +124,12 @@ class DatabaseFB implements Database {
       owner: {
         displayName: u.displayName,
         photoURL: u.photoURL,
-        uid: u.uid,
+        uid: u.uid
       },
       title: "",
-      updated: firebase.firestore.FieldValue.serverTimestamp(),
+      updated: firebase.firestore.FieldValue.serverTimestamp()
     };
-    console.log({newDoc});
+    console.log({ newDoc });
     const docRef = await nbCollection.add(newDoc);
     return docRef.id;
   }
@@ -145,12 +145,12 @@ class DatabaseFB implements Database {
       owner: {
         displayName: u.displayName,
         photoURL: u.photoURL,
-        uid: u.uid,
+        uid: u.uid
       },
       title: "",
-      updated: firebase.firestore.FieldValue.serverTimestamp(),
+      updated: firebase.firestore.FieldValue.serverTimestamp()
     };
-    console.log({newDoc});
+    console.log({ newDoc });
     const docRef = await nbCollection.add(newDoc);
     return docRef.id;
   }
@@ -170,8 +170,10 @@ class DatabaseFB implements Database {
 
   async queryProfile(uid: string, limit: number): Promise<NbInfo[]> {
     lazyInit();
-    const query = nbCollection.orderBy("updated", "desc")
-      .where("owner.uid", "==", uid).limit(limit);
+    const query = nbCollection
+      .orderBy("updated", "desc")
+      .where("owner.uid", "==", uid)
+      .limit(limit);
     const snapshots = await query.get();
     const out = [];
     snapshots.forEach(snap => {
@@ -213,7 +215,7 @@ export class DatabaseMock implements Database {
 
   constructor() {
     assert(defaultDoc != null);
-    this.docs = { "default": Object.assign({}, defaultDoc) };
+    this.docs = { default: Object.assign({}, defaultDoc) };
   }
 
   async getDoc(nbId: string): Promise<NotebookDoc> {
@@ -312,14 +314,14 @@ function lazyInit() {
 export const defaultOwner: UserInfo = Object.freeze({
   displayName: "default owner",
   photoURL: "https://avatars1.githubusercontent.com/u/80?v=4",
-  uid: "abc",
+  uid: "abc"
 });
 
 const defaultDocCells: ReadonlyArray<string> = Object.freeze([
-`
+  `
 console.log("Hello");
 `,
-`
+  `
 1 + 2
 `
 ]);
@@ -329,7 +331,7 @@ export const defaultDoc: NotebookDoc = Object.freeze({
   created: new Date(),
   owner: Object.assign({}, defaultOwner),
   title: "Sample Notebook",
-  updated: new Date(),
+  updated: new Date()
 });
 
 // To bridge the old and new NotebookDoc scheme.

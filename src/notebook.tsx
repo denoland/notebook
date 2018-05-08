@@ -20,8 +20,12 @@
 
 import { Component, h } from "preact";
 import { OutputHandlerDOM } from "../src/output_handler";
-import { createResolvable, IS_WEB,
-  randomString, Resolvable } from "../src/util";
+import {
+  createResolvable,
+  IS_WEB,
+  randomString,
+  Resolvable
+} from "../src/util";
 import { Cell, drainExecuteQueue, OUTPUT_ID_PREFIX } from "./cell";
 import { docTitle, UserTitle } from "./common";
 import * as db from "./db";
@@ -212,19 +216,20 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       const outputDiv = outputDivs.get(id);
       return (
         <Cell
-          ref={ ref => { this.cellRefs.set(id, ref); } }
-          key={ id }
-          id={ id }
-          code={ code }
-          outputDiv={ outputDiv }
-
-          onDelete={ this.onDeleteClicked.bind(this, id) }
-          onInsertCell={ this.onInsertCellClicked.bind(this, id) }
-          onRun={ this.onRun.bind(this, id) }
-          onFocus={ this.onFocus.bind(this, id) }
-          onBlur={ this.onBlur.bind(this, id) }
-          focusNext={ this.focusNext.bind(this, id) }
-          onChange={ this.onChange.bind(this, id) }
+          ref={ref => {
+            this.cellRefs.set(id, ref);
+          }}
+          key={id}
+          id={id}
+          code={code}
+          outputDiv={outputDiv}
+          onDelete={this.onDeleteClicked.bind(this, id)}
+          onInsertCell={this.onInsertCellClicked.bind(this, id)}
+          onRun={this.onRun.bind(this, id)}
+          onFocus={this.onFocus.bind(this, id)}
+          onBlur={this.onBlur.bind(this, id)}
+          focusNext={this.focusNext.bind(this, id)}
+          onChange={this.onChange.bind(this, id)}
         />
       );
     });
@@ -237,20 +242,23 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
       <div class="title">
         <input
           class="title-input"
-          onChange={ this.handleTitleChange.bind(this) }
-          value={ title } />
+          onChange={this.handleTitleChange.bind(this)}
+          value={title}
+        />
         <button
           class="save-title green-button"
-          onClick={ () => {
+          onClick={() => {
             this.setState({ editingTitle: false });
             document.title = `${DEFAULT_TITLE} | ${title}`;
             this.save();
-          } } >
+          }}
+        >
           Save
         </button>
         <button
           class="cancel-edit-title"
-          onClick={ () => this.setState({ editingTitle: false }) } >
+          onClick={() => this.setState({ editingTitle: false })}
+        >
           Cancel
         </button>
       </div>
@@ -259,38 +267,38 @@ export class Notebook extends Component<NotebookProps, NotebookState> {
     const editButton = (
       <button
         class="edit-title"
-        onClick={ () => this.setState({ editingTitle: true }) } >
+        onClick={() => this.setState({ editingTitle: true })}
+      >
         Edit
       </button>
     );
 
     const titleDisplay = (
       <div class="title">
-        <h2
-          class={ title && title.length ? "" : "untitled" }
-          value={ title } >
-          { docTitle(title) }
+        <h2 class={title && title.length ? "" : "untitled"} value={title}>
+          {docTitle(title)}
         </h2>
-        { db.ownsDoc(userInfo, initialDoc) ? editButton : null }
+        {db.ownsDoc(userInfo, initialDoc) ? editButton : null}
       </div>
     );
 
-    const cloneButton = this.props.userInfo == null ? "" : (
-      <button
-        class="green-button"
-        onClick={ () => this.onClone() } >
-        Clone
-      </button>
-    );
+    const cloneButton =
+      this.props.userInfo == null ? (
+        ""
+      ) : (
+        <button class="green-button" onClick={() => this.onClone()}>
+          Clone
+        </button>
+      );
 
     return (
       <div class="notebook-container">
-        <UserTitle userInfo={ initialDoc.owner } />
+        <UserTitle userInfo={initialDoc.owner} />
         <div class="notebook-header">
-          { editingTitle ? titleEdit : titleDisplay }
-          { cloneButton }
+          {editingTitle ? titleEdit : titleDisplay}
+          {cloneButton}
         </div>
-        { this.renderCells() }
+        {this.renderCells()}
       </div>
     );
   }

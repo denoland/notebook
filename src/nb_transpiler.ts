@@ -283,8 +283,8 @@ export class Transpiler {
     return transpiled.toString();
   }
 
-  private static sourcePositionRe =
-    /(?:__transpiled_source_(\d+)__)(?::(\d+))?(?::(\d+))?/;
+  // tslint:disable-next-line:max-line-length
+  private static sourcePositionRe = /(?:__transpiled_source_(\d+)__)(?::(\d+))?(?::(\d+))?/;
   private static topLevelRe = /__transpiled_top_level_(\d+)__/;
   private static hasEvalRe = /\beval\b/;
 

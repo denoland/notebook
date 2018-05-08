@@ -30,8 +30,8 @@ export function propelDir(): string {
   if (process.env.PROPEL_ROOT) {
     return process.env.PROPEL_ROOT;
   } else {
-    const homeDir = process.platform === "win32" ? process.env.USERPROFILE
-                                                 : process.env.HOME;
+    const homeDir =
+      process.platform === "win32" ? process.env.USERPROFILE : process.env.HOME;
     return nodeRequire("path").join(homeDir, ".propel/");
   }
 }

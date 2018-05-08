@@ -6,17 +6,17 @@ const rimraf = require("rimraf");
 // Be extra careful to enable ts-node type checking.
 process.env.TS_NODE_TYPE_CHECK = true;
 
-require("ts-node").register({"typeCheck": true });
+require("ts-node").register({ typeCheck: true });
 
 // Always chdir to propel's project root.
 const root = resolve(__dirname, "..");
 process.chdir(root);
 
 /** Runs a new subprocess synchronously.
-  * We use this instead of shell scripts to support Windows.
-  * The process arguments are forwarded to commands.
-  * This is so one can run ./tools/tslint.js --fix
-  */
+ * We use this instead of shell scripts to support Windows.
+ * The process arguments are forwarded to commands.
+ * This is so one can run ./tools/tslint.js --fix
+ */
 function sh(cmd, env = {}) {
   let args = cmd.split(/\s+/);
   console.log(args.join(" "));
@@ -24,7 +24,7 @@ function sh(cmd, env = {}) {
   // Use this node if node is specified.
   if (exe === "node") exe = process.execPath;
   let r = spawnSync(exe, args, {
-    stdio: 'inherit',
+    stdio: "inherit",
     env: { ...process.env, ...env }
   });
   if (r.error) throw r.error;

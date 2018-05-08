@@ -110,12 +110,15 @@ export class Cell extends Component<CellProps, CellState> {
     if (this.props.onRun) await this.props.onRun(this.code);
     this.setState({ updating: true });
     await delay(100);
-    this.setState({
-      running: false,
-      updating: false
-    }, () => {
-      if (focus) this.focus();
-    });
+    this.setState(
+      {
+        running: false,
+        updating: false
+      },
+      () => {
+        if (focus) this.focus();
+      }
+    );
   }
 
   onChange(code: string) {
@@ -176,15 +179,13 @@ export class Cell extends Component<CellProps, CellState> {
 
   render() {
     const runButton = (
-      <button class="run-button" onClick={ this.clickedRun.bind(this) } />
+      <button class="run-button" onClick={this.clickedRun.bind(this)} />
     );
 
     let deleteButton = null;
     if (this.props.onDelete) {
       deleteButton = (
-        <button
-          class="delete-button"
-          onClick={ this.clickedDelete.bind(this) } />
+        <button class="delete-button" onClick={this.clickedDelete.bind(this)} />
       );
     }
 
@@ -193,7 +194,8 @@ export class Cell extends Component<CellProps, CellState> {
       insertButton = (
         <button
           class="insert-button"
-          onClick={ this.clickedInsertCell.bind(this) } />
+          onClick={this.clickedInsertCell.bind(this)}
+        />
       );
     }
 
@@ -207,29 +209,38 @@ export class Cell extends Component<CellProps, CellState> {
     return (
       <div
         class="notebook-cell"
-        ref={ ref => { this.parentDiv = ref; } }
-        id={ `cell-${id}` } >
-        <div
-          class={ inputClass.join(" ") } >
+        ref={ref => {
+          this.parentDiv = ref;
+        }}
+        id={`cell-${id}`}
+      >
+        <div class={inputClass.join(" ")}>
           <CodeMirrorComponent
-            id={ id ? String(id) : undefined }
-            ref={ ref => { this.cm = ref; } }
-            code={ code }
-            onFocus={ this.onFocus.bind(this) }
-            onBlur={ this.onBlur.bind(this) }
-            onChange={ this.onChange.bind(this) }
-            onAltEnter={ this.runCellAndInsertBelow.bind(this) }
-            onShiftEnter={ this.runCellAndFocusNext.bind(this) }
-            onCtrlEnter={ () => { this.run(); } }
+            id={id ? String(id) : undefined}
+            ref={ref => {
+              this.cm = ref;
+            }}
+            code={code}
+            onFocus={this.onFocus.bind(this)}
+            onBlur={this.onBlur.bind(this)}
+            onChange={this.onChange.bind(this)}
+            onAltEnter={this.runCellAndInsertBelow.bind(this)}
+            onShiftEnter={this.runCellAndFocusNext.bind(this)}
+            onCtrlEnter={() => {
+              this.run();
+            }}
           />
-          { deleteButton }
-          { runButton }
+          {deleteButton}
+          {runButton}
         </div>
         <div class="progress-bar" />
-        <div class="output-container" ref={ (div: any) => {
-          if (div) div.prepend(this.outputDiv);
-        }}>
-          { insertButton }
+        <div
+          class="output-container"
+          ref={(div: any) => {
+            if (div) div.prepend(this.outputDiv);
+          }}
+        >
+          {insertButton}
         </div>
       </div>
     );

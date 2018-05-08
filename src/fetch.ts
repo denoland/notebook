@@ -27,7 +27,7 @@ import {
   nodeRequire,
   process,
   randomString,
-  URL,
+  URL
 } from "./util";
 
 export const propelHostname = "propelml.org";
@@ -110,7 +110,7 @@ async function fetchNodeHTTP(job: string, url: URL): Promise<ArrayBuffer> {
   const req = http.get(url.toString(), res => {
     const total = Number(res.headers["content-length"]);
     let loaded = 0;
-    res.on("data", (chunk) => {
+    res.on("data", chunk => {
       chunks.push(chunk);
       loaded += chunk.length;
       downloadProgress(job, loaded, total);
@@ -121,8 +121,10 @@ async function fetchNodeHTTP(job: string, url: URL): Promise<ArrayBuffer> {
   req.on("error", promise.reject);
   await promise;
   const b = Buffer.concat(chunks);
-  return b.buffer.slice(b.byteOffset,
-    b.byteOffset + b.byteLength) as ArrayBuffer;
+  return b.buffer.slice(
+    b.byteOffset,
+    b.byteOffset + b.byteLength
+  ) as ArrayBuffer;
 }
 
 async function fetchNodeFS(job: string, url: URL): Promise<ArrayBuffer> {
@@ -137,8 +139,11 @@ async function fetchNodeFS(job: string, url: URL): Promise<ArrayBuffer> {
   return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
 }
 
-export function downloadProgress(job: string, loaded: number | null,
-                                 total: number | null): void {
+export function downloadProgress(
+  job: string,
+  loaded: number | null,
+  total: number | null
+): void {
   const oh = getOutputHandler();
   if (oh != null) {
     oh.downloadProgress({ job, loaded, total });

@@ -36,7 +36,7 @@ export const process = IS_NODE ? globalEval("process") : null;
 export const Buffer = IS_NODE ? globalEval("Buffer") : null;
 
 if (IS_NODE) {
-  process.on("unhandledRejection", (error) => {
+  process.on("unhandledRejection", error => {
     throw error;
   });
 }
@@ -68,8 +68,12 @@ export function equal(c: any, d: any): boolean {
     if (a === b) {
       return true;
     }
-    if (typeof a === "number" && typeof b === "number" &&
-        isNaN(a) && isNaN(b)) {
+    if (
+      typeof a === "number" &&
+      typeof b === "number" &&
+      isNaN(a) &&
+      isNaN(b)
+    ) {
       return true;
     }
     if (a && typeof a === "object" && b && typeof b === "object") {
@@ -92,10 +96,16 @@ export function equal(c: any, d: any): boolean {
 }
 
 export function assertEqual(actual: any, expected: any, msg = null) {
-  if (!msg) { msg = `actual: ${actual} expected: ${expected}`; }
+  if (!msg) {
+    msg = `actual: ${actual} expected: ${expected}`;
+  }
   if (!equal(actual, expected)) {
     console.error(
-      "assertEqual failed. actual = ", actual, "expected =", expected);
+      "assertEqual failed. actual = ",
+      actual,
+      "expected =",
+      expected
+    );
     throw new Error(msg);
   }
 }
@@ -110,7 +120,6 @@ export class CounterMap {
 
   keys(): number[] {
     return Array.from(this.map.keys());
-
   }
 
   inc(id: number): void {
@@ -176,7 +185,10 @@ export function randomString(): string {
   // 10 characters are returned:
   //   2log(36^10)                 ~= 51.7 bits
   //   mantisssa of IEEE754 double == 52 bits
-  return (Math.random() + 1).toString(36).padEnd(12, "0").slice(2, 12);
+  return (Math.random() + 1)
+    .toString(36)
+    .padEnd(12, "0")
+    .slice(2, 12);
 }
 
 // The spec says that the maximum length of an array is UINT32_MAX, or 2**32-1.
@@ -188,8 +200,9 @@ const maxNumericalKey = 2 ** 32 - 2;
 // However properties keyed by these "numerical strings" do behave differently.
 // This function returns true when a string (key looks like be a numerical key.
 export function isNumericalKey(key: string): boolean {
-  return Number(key) <= maxNumericalKey &&
-         (key === "0" || /^[1-9]\d*$/.test(key));
+  return (
+    Number(key) <= maxNumericalKey && (key === "0" || /^[1-9]\d*$/.test(key))
+  );
 }
 
 export function tmpdir(): string {

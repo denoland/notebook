@@ -17,12 +17,12 @@
 // FIXME
 // tslint:disable:object-literal-sort-keys
 
-import { h , render } from "preact";
+import { h, render } from "preact";
 import * as vega from "vega-lib";
 import { Inspector } from "./inspector";
 import { InspectorData } from "./serializer";
 
-export type PlotData = Array<Array<{ x: number, y: number }>>;
+export type PlotData = Array<Array<{ x: number; y: number }>>;
 
 export type VegaConfig = vega.Config;
 export type VegaSpec = vega.Spec;
@@ -74,60 +74,59 @@ export class OutputHandlerDOM implements OutputHandler {
       width: 440,
       height: 300,
 
-      data: [{
-        name: "table",
-        values: vegaData,
-      }],
+      data: [
+        {
+          name: "table",
+          values: vegaData
+        }
+      ],
 
       scales: [
         {
           name: "x",
           type: "linear",
-          domain: {"data": "table", "field": "x"},
-          range: "width",
+          domain: { data: "table", field: "x" },
+          range: "width"
         },
         {
           name: "y",
           type: "linear",
-          domain: {"data": "table", "field": "y"},
+          domain: { data: "table", field: "y" },
           range: "height",
           nice: true,
-          zero: true,
+          zero: true
         },
         {
           name: "color",
           type: "ordinal",
-          domain: {"data": "table", "field": "c"},
-          range: "category",
+          domain: { data: "table", field: "c" },
+          range: "category"
         }
       ],
 
-      axes: [
-        {"orient": "bottom", "scale": "x"},
-        {"orient": "left", "scale": "y"}
-      ],
+      axes: [{ orient: "bottom", scale: "x" }, { orient: "left", scale: "y" }],
 
       marks: [
         {
-          "type": "group",
-          "from": {
-            "facet": {
-              "name": "series",
-              "data": "table",
-              "groupby": "c"
+          type: "group",
+          from: {
+            facet: {
+              name: "series",
+              data: "table",
+              groupby: "c"
             }
           },
-          "marks": [
+          marks: [
             {
-              "type": "line",
-              "from": {"data": "series"},
-              "encode": {
-                "enter": {
-                  "x": {"scale": "x", "field": "x"},
-                  "y": {"scale": "y", "field": "y"},
-                  "stroke": {"scale": "color", "field": "c"},
-                  "strokeWidth": {"value": 2}
-                },
+              type: "line",
+              from: { data: "series" },
+              encode: {
+                enter: {
+                  x: { scale: "x", field: "x" },
+                  y: { scale: "y", field: "y" },
+                  stroke: { scale: "color", field: "c" },
+                  strokeWidth: { value: 2 }
+                }
               }
             }
           ]
@@ -140,7 +139,7 @@ export class OutputHandlerDOM implements OutputHandler {
     if (typeof data === "string") {
       const element = this.element;
       const last = element.lastChild;
-      let s = (last && last.nodeType !== Node.TEXT_NODE) ? "\n" : "";
+      let s = last && last.nodeType !== Node.TEXT_NODE ? "\n" : "";
       s += data + "\n";
       const el = document.createTextNode(s);
       element.appendChild(el);
@@ -189,7 +188,7 @@ export class OutputHandlerDOM implements OutputHandler {
 
     let sumLoaded = 0;
     let sumTotal = 0;
-    for (const [_, {loaded, total}] of this.progressJobs) {
+    for (const [_, { loaded, total }] of this.progressJobs) {
       // Total may be null if the size of the download isn't known yet.
       if (total === null) {
         continue;
