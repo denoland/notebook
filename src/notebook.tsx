@@ -19,17 +19,12 @@
  */
 
 import { Component, h } from "preact";
-import { OutputHandlerDOM } from "../src/output_handler";
-import {
-  createResolvable,
-  IS_WEB,
-  randomString,
-  Resolvable
-} from "../src/util";
 import { Cell, drainExecuteQueue, OUTPUT_ID_PREFIX } from "./cell";
 import { docTitle, UserTitle } from "./common";
 import * as db from "./db";
+import { OutputHandlerDOM } from "./output_handler";
 import * as types from "./types";
+import { createResolvable, IS_WEB, randomString, Resolvable } from "./util";
 import { createRPCHandler, VM } from "./vm";
 
 const newNotebookText = "// New Notebook. Insert code here.";

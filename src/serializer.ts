@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-import { isNumericalKey } from "../src/util";
+import { isNumericalKey } from "./util";
 
 export interface AtomDescriptor {
   type: "null" | "undefined" | "getter" | "gettersetter" | "setter";

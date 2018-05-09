@@ -16,8 +16,8 @@
 // This file contains routines for accessing the firebase database (firestore).
 // This is used to save and restore notebooks.
 // These routines are run only on the browser.
-import { assert } from "../src/util";
 import { NbInfo, NotebookDoc, UserInfo } from "./types";
+import { assert } from "./util";
 
 // tslint:disable:no-reference
 /// <reference path="firebase.d.ts" />

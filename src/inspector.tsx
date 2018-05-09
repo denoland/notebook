@@ -14,13 +14,13 @@
  */
 
 import { Component, h } from "preact";
-import { IS_WEB, isNumericalKey, randomString } from "../src/util";
 import {
   BaseObjectDescriptor,
   InspectorData,
   PropertyDescriptor,
   ValueDescriptor
 } from "./serializer";
+import { IS_WEB, isNumericalKey, randomString } from "./util";
 
 type ElementLike = JSX.Element | string | null;
 type ElementList = ElementLike[];

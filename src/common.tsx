@@ -123,8 +123,10 @@ export function docTitle(title: string): string {
   return title && title.length > 0 ? title : "Untitled Notebook";
 }
 
-export function profileLink(u: types.UserInfo, text: string = null)
-  : JSX.Element {
+export function profileLink(
+  u: types.UserInfo,
+  text: string = null
+): JSX.Element {
   const href = window.location.origin + "/notebook/?profile=" + u.uid;
   return (
     <a class="profile-link" href={href}>

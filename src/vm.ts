@@ -14,9 +14,9 @@
  */
 
 import { escape } from "he";
-import { OutputHandlerDOM } from "../src/output_handler";
-import { randomString } from "../src/util";
+import { OutputHandlerDOM } from "./output_handler";
 import { RPC, WindowRPC } from "./rpc";
+import { randomString } from "./util";
 
 function createIframe(rpcChannelId): HTMLIFrameElement {
   const base = new URL("/sandbox", window.document.baseURI).href;

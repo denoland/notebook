@@ -13,9 +13,9 @@
    limitations under the License.
  */
 
-import { assert, assertEqual, global, globalEval } from "../src/util";
 import { test } from "../tools/tester";
 import { Transpiler } from "./nb_transpiler";
+import { assert, assertEqual, global, globalEval } from "./util";
 
 test(function nb_transpiler_transpile() {
   const t = (src: string, expectedBody: string): void => {

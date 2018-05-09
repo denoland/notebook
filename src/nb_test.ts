@@ -1,10 +1,10 @@
 import { h, render, rerender } from "preact";
-import { assert, assertEqual, createResolvable } from "../src/util";
 import { testBrowser } from "../tools/tester";
 import { cellExecuteQueue } from "./cell";
 import * as db from "./db";
 import { Notebook } from "./notebook";
 import * as nb from "./notebook_root";
+import { assert, assertEqual, createResolvable } from "./util";
 
 const DOC_TITLE = "Anonymous Notebook";
 

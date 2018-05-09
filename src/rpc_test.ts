@@ -1,6 +1,6 @@
-import { assertEqual, IS_NODE, nodeRequire } from "../src/util";
 import { test } from "../tools/tester";
 import { RPC, WebSocketRPC } from "./rpc";
+import { assertEqual, IS_NODE, nodeRequire } from "./util";
 
 type ChannelInfo = { rpc1: RPC; rpc2: RPC; cleanup: () => void };
 let makeChannel: () => Promise<ChannelInfo>;

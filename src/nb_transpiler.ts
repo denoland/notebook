@@ -15,7 +15,7 @@
 import { AbstractToken } from "acorn";
 import * as acorn from "acorn/dist/acorn";
 import * as walk from "acorn/dist/walk";
-import { assert, assertEqual } from "../src/util";
+import { assert, assertEqual } from "./util";
 
 function noop() {}
 

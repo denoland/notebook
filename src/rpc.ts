@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-import { createResolvable, Resolvable } from "../src/util";
+import { createResolvable, Resolvable } from "./util";
 
 export type RpcHandler = (...args: any[]) => any;
 export type RpcHandlers = { [name: string]: RpcHandler };
