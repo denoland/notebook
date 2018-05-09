@@ -12,8 +12,6 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { RegularArray } from "./types";
-
 export const debug = false;
 
 // If you use the eval function indirectly, by invoking it via a reference
@@ -128,15 +126,6 @@ export class CounterMap {
   dec(id: number): void {
     this.map.set(id, this.get(id) - 1);
   }
-}
-
-export function deepCloneArray(arr: RegularArray<any>): typeof arr {
-  const arr2 = [];
-  for (let i = 0; i < arr.length; i++) {
-    const value = arr[i];
-    arr2[i] = Array.isArray(value) ? deepCloneArray(value) : value;
-  }
-  return arr2;
 }
 
 // Like setTimeout but with a promise.
