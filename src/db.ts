@@ -317,13 +317,14 @@ export const defaultOwner: UserInfo = Object.freeze({
   uid: "abc"
 });
 
+const testdataUrl = `${location.origin}/static/testdata`;
 const defaultDocCells: ReadonlyArray<string> = Object.freeze([
+  ` console.log("Hello"); `,
+  ` 1 + 2 `,
+  `import * as vegalite from "${testdataUrl}/vega-lite@2.js"`,
+  `import * as tf from "${testdataUrl}/tfjs@0.10.0.js"
+   tf.tensor([1, 2, 3]);
   `
-console.log("Hello");
-`,
-  `
-1 + 2
-`
 ]);
 
 export const defaultDoc: NotebookDoc = Object.freeze({

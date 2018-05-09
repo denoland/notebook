@@ -21,6 +21,6 @@
     "sourceMap": true,
     "target": "es2017"
   },
-  "exclude": ["build", "deps", "node_modules"]
+  "exclude": ["build", "deps", "node_modules", "src/testdata/"]
 }
 

@@ -79,28 +79,24 @@ export class VM {
 }
 
 export type LookupCell = (c: CellId) => OutputHandlerDOM;
-export function createRPCHandler(handler: OutputHandlerDOM | LookupCell) {
-  let lookupCell: LookupCell = handler as LookupCell;
-  if (lookupCell instanceof OutputHandlerDOM) {
-    lookupCell = (c: string) => handler as OutputHandlerDOM;
-  }
+export function createRPCHandler(lookupCell: LookupCell) {
   return {
     plot(cellId: CellId, data: any): void {
-      const cell = lookupCell(cellId);
-      if (!cell) return;
-      cell.plot(data);
+      const oh = lookupCell(cellId);
+      if (!oh) return;
+      oh.plot(data);
     },
 
     print(cellId: CellId, data: any): void {
-      const cell = lookupCell(cellId);
-      if (!cell) return;
-      cell.print(data);
+      const oh = lookupCell(cellId);
+      if (!oh) return;
+      oh.print(data);
     },
 
     downloadProgress(cellId: CellId, data: any): void {
-      const cell = lookupCell(cellId);
-      if (!cell) return;
-      cell.downloadProgress(data);
+      const oh = lookupCell(cellId);
+      if (!oh) return;
+      oh.downloadProgress(data);
     }
   };
 }

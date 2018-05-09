@@ -19,7 +19,7 @@ import { fetchArrayBuffer } from "./fetch";
 import { Transpiler } from "./nb_transpiler";
 import { RPC, WindowRPC } from "./rpc";
 import { describe, InspectorData, InspectorOptions } from "./serializer";
-import { assertEqual, global, globalEval, setOutputHandler } from "./util";
+import { global, globalEval, setOutputHandler } from "./util";
 
 async function fetchText(url: string) {
   const ab = await fetchArrayBuffer(url);
@@ -38,12 +38,16 @@ async function importModule(target) {
 
   // Import remote module with AMD.
   const source = await fetchText(target);
-  let exports = {};
-  global.define = function(dependencies, constructor) {
-    assertEqual(dependencies.length, 0, "Dependencies not supported");
-    exports = constructor();
+  exports = {};
+  global.define = function(dependencies, factory) {
+    // TODO handle dependencies
+    const e = factory(exports);
+    if (e) {
+      exports = e;
+    }
+    console.log("exports", exports);
   };
-  global.define.amd = true;
+  global.define.amd = {};
   globalEval(source);
   delete global.define;
   return exports;
