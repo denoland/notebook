@@ -29,15 +29,16 @@ import {
 import { Cell, drainExecuteQueue, OUTPUT_ID_PREFIX } from "./cell";
 import { docTitle, UserTitle } from "./common";
 import * as db from "./db";
+import * as types from "./types";
 import { createRPCHandler, VM } from "./vm";
 
 const newNotebookText = "// New Notebook. Insert code here.";
 const DEFAULT_TITLE = IS_WEB && document.title;
 
 export interface NotebookProps {
-  save?: (doc: db.NotebookDoc) => void;
-  initialDoc?: db.NotebookDoc;
-  userInfo?: db.UserInfo; // Info about currently logged in user.
+  save?: (doc: types.NotebookDoc) => void;
+  initialDoc?: types.NotebookDoc;
+  userInfo?: types.UserInfo; // Info about currently logged in user.
   clone?: () => void;
 }
 

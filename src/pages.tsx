@@ -19,6 +19,7 @@ import { Component, h, render } from "preact";
 import * as db from "./db";
 import { PropelIndex } from "./index";
 import * as nb from "./notebook_root";
+import * as types from "./types";
 
 export interface Page {
   title: string;
@@ -68,7 +69,7 @@ export function getHTML(title, markup) {
 }
 
 export interface RouterState {
-  userInfo?: db.UserInfo;
+  userInfo?: types.UserInfo;
   loadingAuth: boolean;
 }
 

@@ -31,6 +31,7 @@ import {
 } from "./common";
 import * as db from "./db";
 import { Notebook } from "./notebook";
+import * as types from "./types";
 
 // An anonymous notebook doc for when users aren't logged in
 const anonDoc = {
@@ -67,7 +68,7 @@ export class FixedCell extends Component<FixedProps, {}> {
 }
 
 export interface NotebookRootProps {
-  userInfo?: db.UserInfo; // The current user who is logged in.
+  userInfo?: types.UserInfo; // The current user who is logged in.
   // If nbId is specified, it will be queried, and set in doc.
   nbId?: string;
   // If profileId is specified, it will be queried.
@@ -84,11 +85,11 @@ export interface NotebookRootState {
   profileUid?: string;
 
   // If set a Notebook for this doc will be displayed.
-  doc?: db.NotebookDoc;
+  doc?: types.NotebookDoc;
   // If set the most-recent page will be displayed.
-  mostRecent?: db.NbInfo[];
+  mostRecent?: types.NbInfo[];
   // If set the profile page will be displayed.
-  profileLatest?: db.NbInfo[];
+  profileLatest?: types.NbInfo[];
 
   errorMsg?: string;
 }
@@ -156,7 +157,7 @@ export class NotebookRoot extends Component<
     }
   }
 
-  async handleNotebookSave(doc: db.NotebookDoc) {
+  async handleNotebookSave(doc: types.NotebookDoc) {
     this.setState({ doc });
     if (doc.anonymous) return;
     if (!this.props.userInfo) return;
@@ -228,8 +229,8 @@ export class NotebookRoot extends Component<
 }
 
 export interface MostRecentProps {
-  mostRecent: db.NbInfo[];
-  userInfo?: db.UserInfo;
+  mostRecent: types.NbInfo[];
+  userInfo?: types.UserInfo;
 }
 
 export interface MostRecentState {}
@@ -278,8 +279,8 @@ function newNotebookButton() {
 }
 
 export interface ProfileProps {
-  profileLatest: db.NbInfo[];
-  userInfo?: db.UserInfo;
+  profileLatest: types.NbInfo[];
+  userInfo?: types.UserInfo;
 }
 
 export interface ProfileState {}
@@ -313,7 +314,7 @@ export class Profile extends Component<ProfileProps, ProfileState> {
 }
 
 function notebookList(
-  notebooks: db.NbInfo[],
+  notebooks: types.NbInfo[],
   { showName = true, showTitle = false, showDates = false } = {}
 ): JSX.Element[] {
   return notebooks.map(info => {
@@ -331,7 +332,7 @@ function notebookList(
 }
 
 function notebookBlurb(
-  doc: db.NotebookDoc,
+  doc: types.NotebookDoc,
   { showName = true, showTitle = false, showDates = false } = {}
 ): JSX.Element {
   let body = [];

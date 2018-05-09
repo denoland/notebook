@@ -17,6 +17,7 @@
 // This is used to save and restore notebooks.
 // These routines are run only on the browser.
 import { assert } from "../src/util";
+import { NbInfo, NotebookDoc, UserInfo } from "./types";
 
 // tslint:disable:no-reference
 /// <reference path="firebase.d.ts" />
@@ -33,36 +34,8 @@ export interface Database {
   subscribeAuthChange(cb: (user: UserInfo) => void): UnsubscribeCb;
 }
 
-export interface UserInfo {
-  displayName: string;
-  photoURL: string;
-  uid: string;
-}
-
-export interface CellDoc {
-  id: string;
-  input: string;
-  outputHTML: null | string;
-}
-
-// Defines the scheme of the notebooks collection.
-export interface NotebookDoc {
-  anonymous?: boolean;
-  cells?: string[];
-  cellDocs?: CellDoc[]; // Coming soon.
-  owner: UserInfo;
-  title: string;
-  updated: Date;
-  created: Date;
-}
-
 export interface UnsubscribeCb {
   (): void;
-}
-
-export interface NbInfo {
-  nbId: string;
-  doc: NotebookDoc;
 }
 
 // These are shared by all functions and are lazily constructed by lazyInit.

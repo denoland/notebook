@@ -1,6 +1,7 @@
 // tslint:disable:variable-name
 import { h } from "preact";
 import * as db from "./db";
+import * as types from "./types";
 
 export function Loading(props) {
   return (
@@ -92,7 +93,7 @@ export function UserMenu(props) {
   );
 }
 
-export function Avatar(props: { size?: number; userInfo: db.UserInfo }) {
+export function Avatar(props: { size?: number; userInfo: types.UserInfo }) {
   const size = props.size || 50;
   return (
     <img
@@ -122,7 +123,8 @@ export function docTitle(title: string): string {
   return title && title.length > 0 ? title : "Untitled Notebook";
 }
 
-export function profileLink(u: db.UserInfo, text: string = null): JSX.Element {
+export function profileLink(u: types.UserInfo, text: string = null)
+  : JSX.Element {
   const href = window.location.origin + "/notebook/?profile=" + u.uid;
   return (
     <a class="profile-link" href={href}>
