@@ -44,6 +44,12 @@ export interface FunctionDescriptor extends BaseObjectDescriptor {
 export interface ObjectDescriptor extends BaseObjectDescriptor {
   type: "object";
 }
+export interface TensorDescriptor extends BaseObjectDescriptor {
+  type: "tensor";
+  dtype: string;
+  shape: number[];
+  formatted: string;
+}
 
 export type ValueDescriptor =
   // TODO: add Maps and Sets.
@@ -52,7 +58,8 @@ export type ValueDescriptor =
   | ArrayDescriptor
   | BoxDescriptor
   | ObjectDescriptor
-  | FunctionDescriptor;
+  | FunctionDescriptor
+  | TensorDescriptor;
 export type DescriptorRef = number;
 export interface DescriptorSet {
   [id: number]: ValueDescriptor;
@@ -154,17 +161,26 @@ class DescriptionBuilder {
     };
     const proto = Object.getPrototypeOf(value);
 
+    // Some helper variables that we need later to decide which keys to skip.
+    const valueIsBoxedString = value instanceof String;
+    const valueIsTensor =
+      typeof value.dtype === "string" && Array.isArray(value.shape);
+
     // Capture the name of the constructor.
     if (proto === null) {
       d.ctor = null; // Object has no prototype, so the constructor is null.
-    } else if (typeof proto.constructor === "function") {
-      d.ctor = proto.constructor.name;
+    } else if (
+      typeof proto.constructor !== "function" ||
+      typeof proto.constructor.name !== "string"
+    ) {
+      d.ctor = "[unknown]"; // Could not get the constructor name.
+    } else if (proto.constructor.name === "") {
+      d.ctor = "[anonymous]"; // Constructor has no name.
+    } else if (/^[a-z]$/.test(proto.constructor.name) && valueIsTensor) {
+      d.ctor = "Tensor"; // Tensor; but constructor name was minimized.
     } else {
-      d.ctor = "[unknown]";
+      d.ctor = proto.constructor.name; // Constructor name is usable.
     }
-
-    // Some helper variables that we need later to decide which keys to skip.
-    const valueIsBoxedString = value instanceof String;
 
     // List named properties and symbols.
     const keys = [
@@ -184,7 +200,17 @@ class DescriptionBuilder {
       }
       // Set the 'hidden' flag for non-enumerable properties, as well as a few
       // known-private fields.
-      const hidden = !descriptor.enumerable;
+      const hidden =
+        !descriptor.enumerable ||
+        (valueIsTensor &&
+          (key === "isDisposed" ||
+            key === "size" ||
+            key === "shape" ||
+            key === "dtype" ||
+            key === "strides" ||
+            key === "dataId" ||
+            key === "id" ||
+            key === "rankType"));
       // If the `showHidden` option is not set, skip hidden properties.
       if (hidden && !this.options.showHidden) {
         continue;
@@ -231,7 +257,7 @@ class DescriptionBuilder {
         ...d
       } as FunctionDescriptor;
     } else if (
-      (value instanceof Array || value instanceof TypedArray) &&
+      (Array.isArray(value) || value instanceof TypedArray) &&
       succeeds(() => value.length)
     ) {
       // Array-like object (with a magic length property).
@@ -240,6 +266,15 @@ class DescriptionBuilder {
         length: value.length,
         ...d
       } as ArrayDescriptor;
+    } else if (valueIsTensor) {
+      // Tensorflow.js tensor. Use toString() to format it.
+      return {
+        type: "tensor",
+        dtype: value.dtype,
+        shape: [...value.shape],
+        formatted: value.toString(),
+        ...d
+      } as TensorDescriptor;
     } else if (
       (value instanceof Boolean ||
         value instanceof Number ||

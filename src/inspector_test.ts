@@ -1,8 +1,22 @@
 import { h, render } from "preact";
-import { assertEqual } from "../src/util";
 import { test, testBrowser } from "../tools/tester";
 import { Inspector } from "./inspector";
 import { describe, DescriptorSet, InspectorOptions } from "./serializer";
+import { assertEqual } from "./util";
+
+// Mock Tensor class.
+class Tensor {
+  dtype = "int32";
+  shape = [3, 3];
+  toString() {
+    return [
+      "Tensor",
+      "    [[1, 1, 1],",
+      "     [1, 1, 1],",
+      "     [1, 1, 1]]"
+    ].join("\n");
+  }
+}
 
 // prettier-ignore
 test(async function inspector_describe() {
@@ -215,6 +229,11 @@ test(async function inspector_describe() {
   t(new Function("a", "b", "return a + b"),
     [{ type: "function", name: "anonymous", async: false, class: false, generator: false, ctor: "Function", props: [] }]);
 
+  // Tensorflow.js tensor.
+  t(new Tensor(),
+    [{ type: "tensor", dtype: "int32", shape: [3, 3], ctor: "Tensor", props: [],
+       formatted: "Tensor\n    [[1, 1, 1],\n     [1, 1, 1],\n     [1, 1, 1]]" }]);
+
   // tslint:enable:max-line-length
   // tslint:enable:no-construct
   // tslint:enable:object-literal-sort-keys
@@ -226,7 +245,8 @@ testBrowser(async function inspector_component() {
     list: [9, 8, 7],
     number: 21,
     self: null,
-    string: "text"
+    string: "text",
+    tensor: new Tensor()
   };
   val1.self = val1;
   const val2 = 42;
@@ -243,6 +263,11 @@ testBrowser(async function inspector_component() {
       number: 21
       self: [circular]
       string: "text"
+      tensor: Tensor(int32 3✕3) [
+        [1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1]
+      ]
     }
     42
     {

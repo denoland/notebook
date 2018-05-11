@@ -112,6 +112,31 @@ export class Inspector extends Component<InspectorData, {}> {
     // expand button is clicked.
     const listItems: ElementList = [];
 
+    if (d.type === "tensor") {
+      // The tensor is formatted by Tensor.toString(), we make some small
+      // adjustments to remove extra padding and the "Tensor" header.
+      let formatted = d.formatted.replace(/^Tensor\n/, "");
+      const pad = /^\s*\[/.exec(formatted);
+      if (pad) {
+        // Non-scalar: remove padding and outer square brackets.
+        formatted = formatted
+          .replace(/\]\s*$/, "")
+          .split("\n")
+          .map(s => s.slice(pad[0].length))
+          .map(s => s.trimRight())
+          .join("\n");
+      } else {
+        // Scalar: remove padding.
+        formatted = formatted.trim();
+      }
+      listItems.push(
+        <li class="inspector__li inspector__prop">
+          <div class="inspector__content inspector__content--pre">
+            {formatted}
+          </div>
+        </li>
+      );
+    }
     // Add regular array/object properties.
     const isArray = d.type === "array";
     listItems.push(
@@ -183,6 +208,28 @@ export class Inspector extends Component<InspectorData, {}> {
           ...this.renderPropListWithBraces(d, list)
         );
         break;
+      case "tensor":
+        // Tensor(float32) [1]
+        // Tensor(float32 15) [1, 2, 3, ...etc...]
+        // Tensor(float32 2✕2) [[1, 2], [3, 4]]
+        // Tensor(uint32 3✕4✕4) [[[[...tensor...]]], foo: bar]
+        const isScalar =
+          d.shape.length === 0 || (d.shape.length === 1 && d.shape[0] === 1);
+        elements.push(
+          <span class="cm-def">{d.ctor}</span>,
+          "(",
+          <span class="cm-string-2">{d.dtype}</span>
+        );
+        if (!isScalar) {
+          for (const [dim, size] of d.shape.entries()) {
+            elements.push(
+              dim === 0 ? " " : "✕",
+              <span class="cm-number">{size}</span>
+            );
+          }
+        }
+        elements.push(") [", list, "]");
+        break;
       case "object":
         // Constructor name is omitted when it's "Object", or when the
         // object doesn't have a prototype at all (ctor === null).
@@ -223,6 +270,10 @@ export class Inspector extends Component<InspectorData, {}> {
     // If a reference is circular it can't be expanded.
     if (this.parents.has(d)) {
       return false;
+    }
+    // A tensor can be always expanded to show its values.
+    if (d.type === "tensor") {
+      return true;
     }
     // Objects can be expanded if they have properties.
     if (
