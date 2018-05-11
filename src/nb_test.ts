@@ -160,6 +160,21 @@ testBrowser(async function notebook_executeQueue() {
   assert(output.indexOf("&lt;1&gt;") > 0);
 });
 
+testBrowser(async function notebook_urlImport() {
+  db.enableMock();
+  const { notebookRef } = await renderAnonNotebook();
+  const testdataUrl = `${location.origin}/static/testdata`;
+
+  const cell1 = await notebookRef.insertCell(1, `
+    import { assert, assertEqual } from "test_internals";
+    import * as vegalite from "${testdataUrl}/vega-lite@2.js";
+    import * as tf from "${testdataUrl}/tfjs@0.10.0.js";
+    assertEqual(typeof vegalite.compile, "function");
+    const t = tf.ones([5, 5]);
+    assertEqual(t.shape, [5, 5])`);
+  await notebookRef.onRun(cell1);
+});
+
 // Call this to ensure that the DOM has been updated after events.
 function flush(): Promise<void> {
   rerender();
