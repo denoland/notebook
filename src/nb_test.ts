@@ -173,6 +173,11 @@ testBrowser(async function notebook_urlImport() {
     const t = tf.ones([5, 5]);
     assertEqual(t.shape, [5, 5])`);
   await notebookRef.onRun(cell1);
+
+  const cell2 = await notebookRef.insertCell(2, `
+    import * as tf2 from "${testdataUrl}/tfjs@0.10.0.js";
+    assertEqual(tf, tf2);`);
+  await notebookRef.onRun(cell2);
 });
 
 // Call this to ensure that the DOM has been updated after events.

@@ -27,20 +27,20 @@ async function fetchText(url: string) {
   return enc.decode(ab);
 }
 
-async function importModule(target) {
-  // Import built-in mpodule.
-  const m = {
-    test_internals
-  }[target];
-  if (m) {
-    return m;
+const moduleCache: { [name: string]: any } = Object.create(null);
+moduleCache.test_internals = test_internals; // Built-in module.
+
+async function importModule(target: string) {
+  // Check whether module is in cache.
+  if (target in moduleCache) {
+    return moduleCache[target];
   }
 
   // Import remote module with AMD.
   const source = await fetchText(target);
-  exports = {};
+  let exports = {};
   global.define = function(dependencies, factory) {
-    // TODO handle dependencies
+    // TODO handle dependencies.
     const e = factory(exports);
     if (e) {
       exports = e;
@@ -48,9 +48,13 @@ async function importModule(target) {
     console.log("exports", exports);
   };
   global.define.amd = {};
-  globalEval(source);
-  delete global.define;
-  return exports;
+  try {
+    globalEval(source);
+    moduleCache[target] = exports;
+    return exports;
+  } finally {
+    delete global.define;
+  }
 }
 
 type CellId = number | string;
