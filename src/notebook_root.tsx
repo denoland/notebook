@@ -32,10 +32,6 @@ import {
 import * as db from "./db";
 import { Notebook } from "./notebook";
 
-export function resetNotebook() {
-  // TODO
-}
-
 // An anonymous notebook doc for when users aren't logged in
 const anonDoc = {
   anonymous: true,

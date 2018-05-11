@@ -167,7 +167,8 @@ function flush(): Promise<void> {
 }
 
 function resetPage() {
-  nb.resetNotebook();
+  // Clear out the cell execute queue. This is a hack.
+  cellExecuteQueue.splice(0, cellExecuteQueue.length);
   document.body.innerHTML = "";
 }
 
