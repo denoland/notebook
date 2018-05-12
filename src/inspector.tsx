@@ -67,7 +67,7 @@ export class Inspector extends Component<InspectorData, {}> {
         return [
           "[",
           <span class="inspector__key cm-property">{d.value}</span>,
-          "] :"
+          "]: "
         ];
       default:
         // Keys are always either a string, symbol, or prototype key.

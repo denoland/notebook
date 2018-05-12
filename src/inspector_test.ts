@@ -246,7 +246,8 @@ testBrowser(async function inspector_component() {
     number: 21,
     self: null,
     string: "text",
-    tensor: new Tensor()
+    tensor: new Tensor(),
+    [Symbol("symbol")]: /abc/i
   };
   val1.self = val1;
   const val2 = 42;
@@ -268,6 +269,7 @@ testBrowser(async function inspector_component() {
         [1, 1, 1],
         [1, 1, 1]
       ]
+      [Symbol(symbol)]: /abc/i
     }
     42
     {
