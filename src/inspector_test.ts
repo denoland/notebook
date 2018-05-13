@@ -1,6 +1,6 @@
 import { h, render } from "preact";
 import { test, testBrowser } from "../tools/tester";
-import { Inspector } from "./inspector";
+import { Inspector } from "./components/inspector";
 import { describe, DescriptorSet, InspectorOptions } from "./serializer";
 import { assertEqual } from "./util";
 

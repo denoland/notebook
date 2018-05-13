@@ -16,8 +16,8 @@
 // This is the propelml.org website. It is used both server-side and
 // client-side for generating HTML.
 import { Component, h, render } from "preact";
+import { PropelIndex } from "./components/index";
 import * as db from "./db";
-import { PropelIndex } from "./index";
 import * as nb from "./notebook_root";
 import * as types from "./types";
 

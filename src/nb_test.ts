@@ -1,8 +1,8 @@
 import { h, render, rerender } from "preact";
 import { testBrowser } from "../tools/tester";
-import { cellExecuteQueue } from "./cell";
+import { cellExecuteQueue } from "./components/cell";
+import { Notebook } from "./components/notebook";
 import * as db from "./db";
-import { Notebook } from "./notebook";
 import * as nb from "./notebook_root";
 import { assert, assertEqual, createResolvable } from "./util";
 

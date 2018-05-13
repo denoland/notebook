@@ -19,13 +19,13 @@
  */
 
 import { Component, h } from "preact";
+import { docTitle, UserTitle } from "../common";
+import * as db from "../db";
+import { OutputHandlerDOM } from "../output_handler";
+import * as types from "../types";
+import { createResolvable, IS_WEB, randomString, Resolvable } from "../util";
+import { createRPCHandler, VM } from "../vm";
 import { Cell, drainExecuteQueue, OUTPUT_ID_PREFIX } from "./cell";
-import { docTitle, UserTitle } from "./common";
-import * as db from "./db";
-import { OutputHandlerDOM } from "./output_handler";
-import * as types from "./types";
-import { createResolvable, IS_WEB, randomString, Resolvable } from "./util";
-import { createRPCHandler, VM } from "./vm";
 
 const newNotebookText = "// New Notebook. Insert code here.";
 const DEFAULT_TITLE = IS_WEB && document.title;

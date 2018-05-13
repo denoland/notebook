@@ -19,7 +19,7 @@
 
 import { h, render } from "preact";
 import * as vega from "vega-lib";
-import { Inspector } from "./inspector";
+import { Inspector } from "./components/inspector";
 import { InspectorData } from "./serializer";
 
 export type PlotData = Array<Array<{ x: number; y: number }>>;

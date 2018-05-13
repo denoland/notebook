@@ -15,10 +15,10 @@
 // tslint:disable:variable-name
 import { readFileSync } from "fs";
 import { h } from "preact";
-import { GlobalHeader } from "./common";
+import { GlobalHeader } from "../common";
 
 export const PropelIndex = props => {
-  let md = readFileSync(__dirname + "/../README.md", "utf8");
+  let md = readFileSync(__dirname + "/../../README.md", "utf8");
   md = "<p>" + md.replace(/\n\n/g, "\n\n<p>");
   return (
     <div class="index">

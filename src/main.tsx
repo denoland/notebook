@@ -1,5 +1,5 @@
 import { h, render, rerender } from "preact";
-import { drainExecuteQueue } from "./cell";
+import { drainExecuteQueue } from "./components/cell";
 import { enableFirebase } from "./db";
 import { Router } from "./pages";
 import { assert, IS_WEB } from "./util";

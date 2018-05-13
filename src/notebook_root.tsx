@@ -29,8 +29,8 @@ import {
   UserMenu,
   UserTitle
 } from "./common";
+import { Notebook } from "./components/notebook";
 import * as db from "./db";
-import { Notebook } from "./notebook";
 import * as types from "./types";
 
 // An anonymous notebook doc for when users aren't logged in

@@ -16,10 +16,10 @@
 // React wrapper around CodeMirror editor.
 
 // tslint:disable:no-reference
-/// <reference path="../node_modules/@types/codemirror/index.d.ts" />
+/// <reference path="../../node_modules/@types/codemirror/index.d.ts" />
 
 import { Component, h } from "preact";
-import { normalizeCode } from "./common";
+import { normalizeCode } from "../common";
 
 const codeMirrorElements = new Map<string, Element>();
 

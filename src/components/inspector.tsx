@@ -19,8 +19,8 @@ import {
   InspectorData,
   PropertyDescriptor,
   ValueDescriptor
-} from "./serializer";
-import { IS_WEB, isNumericalKey, randomString } from "./util";
+} from "../serializer";
+import { IS_WEB, isNumericalKey, randomString } from "../util";
 
 type ElementLike = JSX.Element | string | null;
 type ElementList = ElementLike[];
