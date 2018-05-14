@@ -16,7 +16,7 @@
 // This is the propelml.org website. It is used both server-side and
 // client-side for generating HTML.
 import { Component, h, render } from "preact";
-import { PropelIndex } from "./components/index";
+import { Home } from "./components/home";
 import * as db from "./db";
 import * as nb from "./notebook_root";
 import * as types from "./types";
@@ -116,7 +116,7 @@ export const pages: Page[] = [
   {
     title: "Propel ML",
     path: "index.html",
-    root: PropelIndex,
+    root: Home,
     route: /^\/(index.html)?$/
   },
   {

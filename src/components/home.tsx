@@ -17,7 +17,7 @@ import { h } from "preact";
 import { GlobalHeader } from "./header";
 
 // tslint:disable-next-line:variable-name
-export const PropelIndex = props => {
+export const Home = props => {
   let md = readFileSync(__dirname + "/../../README.md", "utf8");
   md = "<p>" + md.replace(/\n\n/g, "\n\n<p>");
   return (
