@@ -12,7 +12,6 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { OutputHandler } from "./output_handler";
 import { RegularArray } from "./types";
 
 export const debug = false;
@@ -169,16 +168,6 @@ export function createResolvable<T>(): Resolvable<T> {
     methods = { resolve, reject };
   });
   return Object.assign(promise, methods) as Resolvable<T>;
-}
-
-let activeOutputHandler: OutputHandler | null = null;
-
-export function getOutputHandler(): OutputHandler | null {
-  return activeOutputHandler;
-}
-
-export function setOutputHandler(handler: OutputHandler): void {
-  activeOutputHandler = handler;
 }
 
 export function randomString(): string {

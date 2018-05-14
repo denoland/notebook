@@ -39,6 +39,16 @@ export interface OutputHandler {
   downloadProgress(progress: Progress);
 }
 
+let activeOutputHandler: OutputHandler | null = null;
+
+export function getOutputHandler(): OutputHandler | null {
+  return activeOutputHandler;
+}
+
+export function setOutputHandler(handler: OutputHandler): void {
+  activeOutputHandler = handler;
+}
+
 const progressOutputHandlerMap = new Map<string, OutputHandler>();
 
 export class OutputHandlerDOM implements OutputHandler {

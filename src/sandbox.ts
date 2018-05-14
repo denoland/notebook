@@ -17,9 +17,10 @@ import * as test_internals from "./test_internals";
 
 import { fetchArrayBuffer } from "./fetch";
 import { Transpiler } from "./nb_transpiler";
+import { setOutputHandler } from "./output_handler";
 import { RPC, WindowRPC } from "./rpc";
 import { describe, InspectorData, InspectorOptions } from "./serializer";
-import { global, globalEval, setOutputHandler } from "./util";
+import { global, globalEval } from "./util";
 
 async function fetchText(url: string) {
   const ab = await fetchArrayBuffer(url);

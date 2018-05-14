@@ -16,11 +16,11 @@
 // This file contains Propel's central system for loading data from remote URLs
 // or local files. There is a progress system to notify users about download.
 // See also fetchWithCache.
+import { getOutputHandler } from "./output_handler";
 import {
   assert,
   Buffer,
   createResolvable,
-  getOutputHandler,
   global,
   IS_NODE,
   IS_WEB,
