@@ -1,6 +1,6 @@
 {
   "extends": [
-    "tslint-eslint-rules"
+    "tslint-eslint-rules", "tslint-no-circular-imports"
   ],
   "rules": {
     "align": [
