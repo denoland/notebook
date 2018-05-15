@@ -26,7 +26,8 @@ import { Loading } from "./components/loading";
 import { UserMenu } from "./components/menu";
 import { NewNotebookButton } from "./components/new_notebook_button";
 import { Notebook } from "./components/notebook";
-import { profileLink, UserTitle } from "./components/user_title";
+import { Profile } from "./components/profile";
+import { profileLink } from "./components/user_title";
 import * as db from "./db";
 import * as types from "./types";
 
@@ -154,7 +155,16 @@ export class NotebookRoot extends Component<
     }
   }
 
-  async handleNotebookSave(doc: types.NotebookDoc) {
+  private async onNewNotebook() {
+    const nbId = await db.active.create();
+    window.location.href = nbUrl(nbId);
+  }
+
+  private async onOpenNotebook(nbId: string) {
+    window.location.href = nbUrl(nbId);
+  }
+
+  private async handleNotebookSave(doc: types.NotebookDoc) {
     this.setState({ doc });
     if (doc.anonymous) return;
     if (!this.props.userInfo) return;
@@ -189,8 +199,10 @@ export class NotebookRoot extends Component<
     } else if (this.state.profileLatest) {
       body = (
         <Profile
-          profileLatest={this.state.profileLatest}
+          notebooks={this.state.profileLatest}
           userInfo={this.props.userInfo}
+          onNewNotebook={this.onNewNotebook.bind(this)}
+          onOpenNotebook={this.onOpenNotebook.bind(this)}
         />
       );
     } else if (this.state.doc) {
@@ -268,48 +280,6 @@ export class MostRecent extends Component<MostRecentProps, MostRecentState> {
         <NotebookList
           showTitle={false}
           notebooks={this.props.mostRecent}
-          onOpen={this.onOpenNotebook.bind(this)}
-        />
-      </div>
-    );
-  }
-}
-
-export interface ProfileProps {
-  profileLatest: types.NbInfo[];
-  userInfo?: types.UserInfo;
-}
-
-export interface ProfileState {}
-
-export class Profile extends Component<ProfileProps, ProfileState> {
-  private async onNewNotebook() {
-    const nbId = await db.active.create();
-    window.location.href = nbUrl(nbId);
-  }
-
-  private onOpenNotebook(nbId: string) {
-    window.location.href = nbUrl(nbId);
-  }
-
-  render() {
-    if (this.props.profileLatest.length === 0) {
-      return <h1>User has no notebooks</h1>;
-    }
-    const doc = this.props.profileLatest[0].doc;
-
-    // TODO Profile is reusing the most-recent css class, because it's a very
-    // similar layout. The CSS class should be renamed something appropriate
-    // for both of them, maybe nb-listing.
-    return (
-      <div class="most-recent">
-        <div class="most-recent-header">
-          <UserTitle userInfo={doc.owner} />
-          <NewNotebookButton onClick={this.onNewNotebook.bind(this)} />
-        </div>
-        <NotebookList
-          showTitle={true}
-          notebooks={this.props.profileLatest}
           onOpen={this.onOpenNotebook.bind(this)}
         />
       </div>
