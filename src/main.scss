@@ -409,10 +409,10 @@ header {
       /* Top right corner */
       grid-column: 2 / -1;
       grid-row: 1 / 2;
-      background-image: url(./img/deleteButtonOutline.svg);
+      background-image: url("./img/deleteButtonOutline.svg");
 
       &:hover {
-        background-image: url(./img/deleteButtonFill.svg);
+        background-image: url("./img/deleteButtonFill.svg");
       }
     }
 
@@ -420,7 +420,7 @@ header {
       /* Bottom right corner */
       grid-column: 2 / -1;
       grid-row: 3 / -1;
-      background-image: url(./img/runButton.svg);
+      background-image: url("./img/runButton.svg");
     }
 
     /* Auto-resizing cells. */
@@ -438,7 +438,7 @@ header {
       /* Bottom right corner */
       grid-column: 2 / -1;
       grid-row: 3 / -1;
-      background-image: url(./img/insertButton.svg);
+      background-image: url("./img/insertButton.svg");
     }
   }
 

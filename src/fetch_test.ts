@@ -13,14 +13,12 @@
    limitations under the License.
  */
 
-import { localServer, test } from "../tools/tester";
+import { testBrowser } from "../tools/tester";
 import * as fetch from "./fetch";
 import { assertEqual } from "./util";
 
-test(async function fetch_fetchArrayBuffer() {
-  await localServer(async function(url: string) {
-    url += "/img/runButton.svg";
-    const ab = await fetch.fetchArrayBuffer(url);
-    assertEqual(ab.byteLength, 138);
-  });
+testBrowser(async function fetch_fetchArrayBuffer() {
+  const url = require("./testdata/hello.txt");
+  const ab = await fetch.fetchArrayBuffer(url);
+  assertEqual(ab.byteLength, 14);
 });

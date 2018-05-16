@@ -28,7 +28,6 @@ async function bundler(build) {
   run.mkdir("build");
   run.mkdir(wdir);
   run.symlink(run.root + "/src/", wdir + "static");
-  run.symlink(run.root + "/src/img", wdir + "img");
 
   const opts = {
     autoinstall: false,

@@ -228,7 +228,7 @@ async function renderNotebook(): Promise<Notebook> {
       created: new Date(),
       owner: {
         displayName: "Anonymous",
-        photoURL: "/static/img/anon_profile.png?",
+        photoURL: require("./img/anon_profile.png"),
         uid: ""
       },
       title: DOC_TITLE,

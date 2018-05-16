@@ -2,6 +2,7 @@
 import { h } from "preact";
 import * as db from "./db";
 import * as types from "./types";
+import { URL } from "./util";
 
 export function Loading(props) {
   return (
@@ -95,11 +96,13 @@ export function UserMenu(props) {
 
 export function Avatar(props: { size?: number; userInfo: types.UserInfo }) {
   const size = props.size || 50;
+  const photo = new URL(props.userInfo.photoURL, window.location.href);
+  photo.searchParams.set("size", size);
   return (
     <img
       class="avatar"
       height={size}
-      src={props.userInfo.photoURL + "&size=" + size}
+      src={photo.href}
       width={size}
     />
   );

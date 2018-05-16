@@ -53,7 +53,7 @@ export function getHTML(title, markup) {
     <link rel="stylesheet" href="/bundle.css"/>
     ${scriptTags}
     <script src="/main.js"></script>
-    <link rel="icon" type="image/png" href="/static/favicon.png">
+    <link rel="icon" type="image/png" href="./favicon.png">
   </head>
   <body>${markup}
   <script async
