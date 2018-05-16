@@ -1,7 +1,5 @@
 //  CSS should follow BEM syntax structure moving forward.  
 //  https://en.bem.info/methodology/
-//  Only the references and index pages have been converted so far, 
-//  see references.scss or index.scss for examples.
 
 @import './normalize.scss';
 @import './codemirror.scss';
@@ -20,8 +18,6 @@ $size3: 64px;
 $borderColor: #eee;
 $accentColor: #247ee9;  // blue
 $shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.3);
-//  Following imports use above variables, thus imported here.
-@import './index.scss';
 
 @mixin buttonHover {
   -webkit-transform: perspective(1px) translateZ(0);
@@ -63,8 +59,6 @@ body {
 }
 
 /* Centers and gives max-width to index, references, notebook pages */
-.training__inner,
-.use-it-inner,
 .flex-row,
 .references {
   max-width: 960px;
