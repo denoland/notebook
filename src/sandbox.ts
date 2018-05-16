@@ -46,7 +46,6 @@ async function importModule(target: string) {
     if (e) {
       exports = e;
     }
-    console.log("exports", exports);
   };
   global.define.amd = {};
   try {
