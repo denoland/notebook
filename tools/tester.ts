@@ -92,6 +92,8 @@ function log(...args) {
 }
 
 async function runTests() {
+  if (tests.length === 0) return; // No tests to run.
+
   let passed = 0;
   let failed = 0;
 
