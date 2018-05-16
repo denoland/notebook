@@ -58,7 +58,7 @@ function symlink(a, b) {
 
   if (existing) {
     if (resolve(b, a) === resolve(b, existing)) {
-      console.log("symlink already exists", a, b);
+      // Symlink already exists, and it already points at the right target.
       return;
     } else {
       // Remove the existing symlink.
