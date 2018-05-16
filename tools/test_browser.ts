@@ -55,7 +55,7 @@ interface Test {
 // This special webpage runs the tests in the browser.
 // If a filter is supplied, it is the only page loaded.
 const propelTests: Test = {
-  path: "static/test.html#script=/test_website.js",
+  path: "test.html",
   doneMsg: /DONE/,
   timeout: 2 * 60 * 1000
 };

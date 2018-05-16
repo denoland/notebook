@@ -41,14 +41,8 @@ async function bundler(build) {
     watch: !build
   };
 
-  let b = new Bundler("src/sandbox.ts", opts);
-  await b.bundle();
-
-  b = new Bundler("tools/test_website.ts", opts);
-  await b.bundle();
-
-  const indexBunder = new Bundler("src/index.html", opts);
-  return indexBunder;
+  const entryPoints = ["src/sandbox.ts", "src/index.html", "src/test.html"];
+  return new Bundler(entryPoints, opts);
 }
 
 const port = 8080;

@@ -4,7 +4,7 @@ import { cellExecuteQueue } from "./components/cell";
 import { Notebook } from "./components/notebook";
 import * as db from "./db";
 import * as nb from "./notebook_root";
-import { assert, assertEqual, createResolvable } from "./util";
+import { assert, assertEqual, createResolvable, delay } from "./util";
 
 const DOC_TITLE = "Anonymous Notebook";
 
@@ -115,9 +115,10 @@ testBrowser(async function notebook_progressBar() {
 });
 
 testBrowser(async function notebook_title() {
-  const currentTitle = (document.title = "Propel Tests");
+  const originalTitle = document.title = "Propel tests";
+  await delay(0); // Yield to allow document title to be updated.
   await renderNotebook();
-  assertEqual(document.title, `${currentTitle} | ${DOC_TITLE}`);
+  assertEqual(document.title, `${originalTitle} | ${DOC_TITLE}`);
 });
 
 testBrowser(async function notebook_profile() {
