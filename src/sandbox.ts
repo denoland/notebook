@@ -20,7 +20,7 @@ import { Transpiler } from "./nb_transpiler";
 import { setOutputHandler } from "./output_handler";
 import { RPC, WindowRPC } from "./rpc";
 import { describe, InspectorData, InspectorOptions } from "./serializer";
-import { global, globalEval } from "./util";
+import { global, globalEval, URL } from "./util";
 
 async function fetchText(url: string) {
   const ab = await fetchArrayBuffer(url);
@@ -29,9 +29,22 @@ async function fetchText(url: string) {
 }
 
 const moduleCache: { [name: string]: any } = Object.create(null);
-moduleCache.test_internals = test_internals; // Built-in module.
 
 async function importModule(target: string) {
+  // Check whether module is a built-in.
+  switch (target) {
+    case "test_internals": return test_internals;
+  }
+
+  // Normalize the URL, and check that it is fully-qualified, otherwise we might
+  // end up serving them the default route (index.html) from the server that
+  // hosts the notebook, which produces very confusing syntax errors.
+  try {
+    target = new URL(target).href;
+  } catch (e) {
+    throw new TypeError(`Invalid module name: '${target}'`);
+  }
+
   // Check whether module is in cache.
   if (target in moduleCache) {
     return moduleCache[target];
