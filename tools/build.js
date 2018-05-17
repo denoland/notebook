@@ -16,7 +16,7 @@ const path = require("path");
 const Bundler = require("parcel-bundler");
 const url = require("url");
 
-let wdir = "build/dev_website/";
+let wdir = "build/website/";
 
 exports.build = build;
 exports.buildAndServe = buildAndServe;

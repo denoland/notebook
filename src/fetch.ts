@@ -81,7 +81,7 @@ export function resolve(p: string, isTest?: boolean): URL {
     } else {
       const url2 = new URL("file:///");
       const { join } = nodeRequire("path");
-      const pathname = join(__dirname, "../build/dev_website/", url.pathname);
+      const pathname = join(__dirname, "../build/website/", url.pathname);
       url2.pathname = pathname;
       url = url2;
     }

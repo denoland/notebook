@@ -74,7 +74,7 @@ const TESTS: Test[] = [
 
   let server, port;
   if (useRenderFlag) {
-    server = createServer({ cors: true, root: "./build/dev_website" });
+    server = createServer({ cors: true, root: "./build/website" });
     server.listen();
     port = server.server.address().port;
   } else {

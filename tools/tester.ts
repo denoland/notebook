@@ -137,7 +137,7 @@ export async function localServer(
     // We don't need a local server, since we're being hosted from one already.
     await cb(`http://${document.location.host}/`);
   } else {
-    const root = __dirname + "/../build/dev_website";
+    const root = __dirname + "/../build/website";
     const { isDir } = require("../src/util_node");
     assert(
       isDir(root),
