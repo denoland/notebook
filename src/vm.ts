@@ -14,7 +14,7 @@
  */
 
 import { escape } from "he";
-import { OutputHandlerDOM } from "./output_handler";
+import { OutputHandlerDOM } from "./output_handler_dom";
 import { RPC, WindowRPC } from "./rpc";
 import { randomString } from "./util";
 

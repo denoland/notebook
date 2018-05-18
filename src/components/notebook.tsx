@@ -21,7 +21,7 @@
 import { Component, h } from "preact";
 import { docTitle, UserTitle } from "../common";
 import * as db from "../db";
-import { OutputHandlerDOM } from "../output_handler";
+import { OutputHandlerDOM } from "../output_handler_dom";
 import * as types from "../types";
 import { createResolvable, IS_WEB, randomString, Resolvable } from "../util";
 import { createRPCHandler, VM } from "../vm";
