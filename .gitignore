@@ -2,6 +2,7 @@
 *_BACKUP_*
 *_REMOTE_*
 *_LOCAL_*
+*.bak
 *.orig
 *.TMP
 
