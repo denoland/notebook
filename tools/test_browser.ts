@@ -12,28 +12,26 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { createServer } from "http-server";
 import * as puppeteer from "puppeteer";
 import { format } from "util";
+import "../src/util"; // Makes node crash on unhandled promise rejection.
 import { exitOnFail } from "./tester";
 
-// In addition to importing IS_NODE, importing util.ts has the necessary
-// side-effect of making unhandled rejections crash node.
-import { IS_NODE } from "../src/util";
+// For some reason ts-node blows up if any typescript files are imported
+// after importing a .javascript file, so we do this last.
+import { buildAndServe } from "./build.js";
 
-let useRenderFlag = false;
-const i = process.argv.indexOf("use-render");
+let serveFlag = false;
+const i = process.argv.indexOf("serve");
 if (i >= 0) {
-  useRenderFlag = true;
+  serveFlag = true;
   process.argv.splice(i, 1); // delete flag;
 }
 
 // Allow people to filter the tests from the command-line.
 // Example: ts-node ./tools/test_browser.ts concat
-let filterExpr: string = null;
-if (IS_NODE) {
-  if (process.argv.length >= 2) filterExpr = process.argv[2];
-}
+const filterExpr: string | null =
+  process.argv.length > 2 ? process.argv[2] : null;
 
 // The PP_TEST_DEBUG environment variable can be used to run the tests in
 // debug mode. When debug mode is enabled...
@@ -72,11 +70,10 @@ const TESTS: Test[] = [
   let passed = 0,
     failed = 0;
 
-  let server, port;
-  if (useRenderFlag) {
-    server = createServer({ cors: true, root: "./build/website" });
-    server.listen();
-    port = server.server.address().port;
+  let port, server;
+  if (serveFlag) {
+    server = buildAndServe({ port: 0, watch: false });
+    port = server.address().port;
   } else {
     port = 8080;
   }

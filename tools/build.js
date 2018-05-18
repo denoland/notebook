@@ -80,11 +80,12 @@ function makeBundle(options = {}) {
 }
 
 function buildAndServe(options = {}) {
-  const port = 8080;
+  const { port } = { port: 8080, ...options };
   console.log(`Server listening on http://localhost:${port}/`);
 
-  const bundler = makeBundle({ ...options, watch: true });
+  const bundler = makeBundle({ watch: true, ...options });
   const middleware = bundler.middleware();
+
   const server = http.createServer((req, res) => {
     const u = url.parse(req.url);
     if (u.pathname === "/") {
@@ -99,6 +100,8 @@ function buildAndServe(options = {}) {
     return middleware(req, res);
   });
   server.listen(port);
+
+  return server;
 }
 
 function build(options = {}) {

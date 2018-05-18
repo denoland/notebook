@@ -21,7 +21,7 @@
     "@types/node": "^8.9.4",
     "acorn": "^5.5.0",
     "codemirror": "^5.35.0",
-    "http-server": "^0.10.0",
+    "he": "^1.1.1",
     "ncp": "^2.0.0",
     "node-fetch": "^1.7.3",
     "node-sass": "^4.9.0",
