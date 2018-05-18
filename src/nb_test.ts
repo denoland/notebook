@@ -164,7 +164,7 @@ testBrowser(async function notebook_executeQueue() {
 testBrowser(async function notebook_urlImport() {
   db.enableMock();
   const { notebookRef } = await renderAnonNotebook();
-  const testdataUrl = `${location.origin}/static/testdata`;
+  const testdataUrl = `${location.origin}/repo/src/testdata`;
 
   const cell1 = await notebookRef.insertCell(1, `
     import { assert, assertEqual } from "test_internals";

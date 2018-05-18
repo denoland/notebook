@@ -4,10 +4,12 @@ const usage = `
 Usage:
   node build.js [clean] [prod] [serve]
 Options:
-  clean   Clean output directory first.  # Build in debug mode (default).
+  clean   Clean output directory first.
   prod    Build for production (minified). Default is not to minify.
   serve   Serve at http://localhost:8080/ and watch for changes.
 `;
+
+const wdir = "build/website/";
 
 const run = require("./run");
 const fs = require("fs");
@@ -15,8 +17,6 @@ const http = require("http");
 const path = require("path");
 const Bundler = require("parcel-bundler");
 const url = require("url");
-
-let wdir = "build/website/";
 
 exports.build = build;
 exports.buildAndServe = buildAndServe;
@@ -54,8 +54,8 @@ function makeBundle(options = {}) {
   run.mkdir(wdir);
 
   if (!options.production) {
-    // The symlink is only needed for tests.
-    run.symlink(run.root + "/src/", wdir + "static");
+    // The symlink to the source repository root is only needed for tests.
+    run.symlink(run.root, wdir + "repo");
   }
 
   options = {
@@ -66,6 +66,7 @@ function makeBundle(options = {}) {
     minify: !!options.production,
     outDir: wdir,
     publicUrl: "/",
+    sourceMaps: !options.production,
     watch: false,
     ...options
   };
@@ -74,6 +75,7 @@ function makeBundle(options = {}) {
   if (!options.production) {
     entryPoints.push("src/test.html");
   }
+
   return new Bundler(entryPoints, options);
 }
 

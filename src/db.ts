@@ -290,7 +290,7 @@ export const defaultOwner: UserInfo = Object.freeze({
   uid: "abc"
 });
 
-const testdataUrl = `${location.origin}/static/testdata`;
+const testdataUrl = `${location.origin}/repo/src/testdata`;
 const defaultDocCells: ReadonlyArray<string> = Object.freeze([
   ` console.log("Hello"); `,
   ` 1 + 2 `,
