@@ -85,11 +85,14 @@ function buildAndServe(options = {}) {
   const middleware = bundler.middleware();
   const server = http.createServer((req, res) => {
     const u = url.parse(req.url);
-    // Rewrite requests without a file extension to /index.html.
-    if (path.extname(u.pathname) === "") {
+    if (u.pathname === "/") {
+      // Rewrite requests for / to /index.html.
       u.pathname = "/index.html";
-      req.url = url.format(u);
+    } else if (path.extname(u.pathname) === "") {
+      // Add .html to paths without an extension.
+      u.pathname += ".html";
     }
+    req.url = url.format(u);
     // Let the parcel built-in webserver handle the rest.
     return middleware(req, res);
   });
