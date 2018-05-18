@@ -121,7 +121,7 @@ export const pages: Page[] = [
   },
   {
     title: "Propel Notebook",
-    path: "notebook/index.html",
+    path: "notebook.html",
     root: nb.NotebookRoot,
     route: /^\/notebook/
   }
