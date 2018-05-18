@@ -52,7 +52,11 @@ if (require.main === module) {
 function makeBundle(options = {}) {
   run.mkdir("build");
   run.mkdir(wdir);
-  run.symlink(run.root + "/src/", wdir + "static");
+
+  if (!options.production) {
+    // The symlink is only needed for tests.
+    run.symlink(run.root + "/src/", wdir + "static");
+  }
 
   options = {
     autoinstall: false,
@@ -66,7 +70,10 @@ function makeBundle(options = {}) {
     ...options
   };
 
-  const entryPoints = ["src/index.html", "src/sandbox.ts", "src/test.html"];
+  const entryPoints = ["src/index.html", "src/sandbox.ts"];
+  if (!options.production) {
+    entryPoints.push("src/test.html");
+  }
   return new Bundler(entryPoints, options);
 }
 
