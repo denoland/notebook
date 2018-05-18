@@ -36,11 +36,11 @@
     "stylelint-config-standard": "^18.2.0",
     "text-encoding": "^0.6.4",
     "ts-loader": "^3.5.0",
-    "ts-node": "^4.1.0",
+    "ts-node": "^6.0.3",
     "tslint": "^5.9.1",
     "tslint-eslint-rules": "^5.1.0",
     "tslint-no-circular-imports": "^0.3.0",
-    "typescript": "^2.7.2",
+    "typescript": "^2.8.3",
     "vega-lib": "^3.2.1",
     "ws": "^5.0.0"
   },
