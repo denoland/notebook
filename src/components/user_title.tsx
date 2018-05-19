@@ -12,22 +12,32 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { readFileSync } from "fs";
-import { h } from "preact";
-import { GlobalHeader } from "./header";
 
-// tslint:disable-next-line:variable-name
-export const PropelIndex = props => {
-  let md = readFileSync(__dirname + "/../../README.md", "utf8");
-  md = "<p>" + md.replace(/\n\n/g, "\n\n<p>");
+import { h } from "preact";
+import * as types from "../types";
+import { Avatar } from "./avatar";
+
+export function profileLink(
+  u: types.UserInfo,
+  text: string = null
+): JSX.Element {
+  const href = window.location.origin + "/notebook?profile=" + u.uid;
   return (
-    <div class="index">
-      <GlobalHeader />
-      <div class="intro flex-row">
-        <div class="flex-cell">
-          <div dangerouslySetInnerHTML={{ __html: md }} />
-        </div>
-      </div>
+    <a class="profile-link" href={href}>
+      {text ? text : u.displayName}
+    </a>
+  );
+}
+
+export interface UserTitleProps {
+  userInfo: types.UserInfo;
+}
+
+export function UserTitle(props: UserTitleProps): JSX.Element {
+  return (
+    <div class="most-recent-header-title">
+      <Avatar userInfo={props.userInfo} />
+      <h2>{profileLink(props.userInfo)}</h2>
     </div>
   );
-};
+}

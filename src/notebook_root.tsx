@@ -19,17 +19,13 @@
 // server-side so the results can be displayed even if javascript is disabled.
 
 import { Component, h } from "preact";
-import {
-  Avatar,
-  docTitle,
-  GlobalHeader,
-  Loading,
-  normalizeCode,
-  profileLink,
-  UserMenu,
-  UserTitle
-} from "./common";
+import { Avatar } from "./components/avatar";
+import { docTitle, normalizeCode } from "./components/common";
+import { GlobalHeader } from "./components/header";
+import { Loading } from "./components/loading";
+import { UserMenu } from "./components/menu";
 import { Notebook } from "./components/notebook";
+import { profileLink, UserTitle } from "./components/user_title";
 import * as db from "./db";
 import * as types from "./types";
 

@@ -12,22 +12,26 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { readFileSync } from "fs";
-import { h } from "preact";
-import { GlobalHeader } from "./header";
 
-// tslint:disable-next-line:variable-name
-export const PropelIndex = props => {
-  let md = readFileSync(__dirname + "/../../README.md", "utf8");
-  md = "<p>" + md.replace(/\n\n/g, "\n\n<p>");
+import { h } from "preact";
+import * as types from "../types";
+import { URL } from "../util";
+
+export interface AvatarProps {
+  size?: number;
+  userInfo: types.UserInfo;
+}
+
+export function Avatar(props: AvatarProps): JSX.Element {
+  const size = props.size || 50;
+  const photo = new URL(props.userInfo.photoURL, window.location.href);
+  photo.searchParams.set("size", size);
   return (
-    <div class="index">
-      <GlobalHeader />
-      <div class="intro flex-row">
-        <div class="flex-cell">
-          <div dangerouslySetInnerHTML={{ __html: md }} />
-        </div>
-      </div>
-    </div>
+    <img
+      class="avatar"
+      height={size}
+      src={photo.href}
+      width={size}
+    />
   );
-};
+}

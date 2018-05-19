@@ -12,22 +12,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { readFileSync } from "fs";
-import { h } from "preact";
-import { GlobalHeader } from "./header";
 
-// tslint:disable-next-line:variable-name
-export const PropelIndex = props => {
-  let md = readFileSync(__dirname + "/../../README.md", "utf8");
-  md = "<p>" + md.replace(/\n\n/g, "\n\n<p>");
+import { h } from "preact";
+// TODO None of component in ./src/components should depend on ./src/db.ts.
+import * as db from "../db";
+import { nbUrl } from "./common";
+
+export function newNotebookButton(): JSX.Element {
   return (
-    <div class="index">
-      <GlobalHeader />
-      <div class="intro flex-row">
-        <div class="flex-cell">
-          <div dangerouslySetInnerHTML={{ __html: md }} />
-        </div>
-      </div>
-    </div>
+    <button
+      class="create-notebook"
+      onClick={async () => {
+        // Redirect to new notebook.
+        const nbId = await db.active.create();
+        window.location.href = nbUrl(nbId);
+      }}
+    >
+      + New Notebook
+    </button>
   );
-};
+}

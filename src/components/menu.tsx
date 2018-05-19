@@ -12,22 +12,34 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { readFileSync } from "fs";
-import { h } from "preact";
-import { GlobalHeader } from "./header";
 
-// tslint:disable-next-line:variable-name
-export const PropelIndex = props => {
-  let md = readFileSync(__dirname + "/../../README.md", "utf8");
-  md = "<p>" + md.replace(/\n\n/g, "\n\n<p>");
-  return (
-    <div class="index">
-      <GlobalHeader />
-      <div class="intro flex-row">
-        <div class="flex-cell">
-          <div dangerouslySetInnerHTML={{ __html: md }} />
+import { h } from "preact";
+// TODO
+// Files in ./src/components should not depend on db.
+import * as db from "../db";
+import * as types from "../types";
+import { Avatar } from "./avatar";
+
+export interface UserMenuProps {
+  userInfo: types.UserInfo;
+}
+
+export function UserMenu(props): JSX.Element {
+  if (props.userInfo) {
+    return (
+      <div class="dropdown">
+        <Avatar size={32} userInfo={props.userInfo} />
+        <div class="dropdown-content">
+          <a href="#" onClick={db.active.signOut}>
+            Sign out
+          </a>
         </div>
       </div>
-    </div>
+    );
+  }
+  return (
+    <a href="#" onClick={db.active.signIn}>
+      Sign in
+    </a>
   );
-};
+}

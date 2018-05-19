@@ -12,22 +12,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { readFileSync } from "fs";
-import { h } from "preact";
-import { GlobalHeader } from "./header";
 
-// tslint:disable-next-line:variable-name
-export const PropelIndex = props => {
-  let md = readFileSync(__dirname + "/../../README.md", "utf8");
-  md = "<p>" + md.replace(/\n\n/g, "\n\n<p>");
-  return (
-    <div class="index">
-      <GlobalHeader />
-      <div class="intro flex-row">
-        <div class="flex-cell">
-          <div dangerouslySetInnerHTML={{ __html: md }} />
-        </div>
-      </div>
-    </div>
-  );
-};
+// Trims whitespace.
+export function normalizeCode(code: string): string {
+  return code.trimRight();
+}
+
+export function docTitle(title: string): string {
+  return title && title.length > 0 ? title : "Untitled Notebook";
+}
+
+export function nbUrl(nbId: string): string {
+  const u = window.location.origin + "/notebook?nbId=" + nbId;
+  return u;
+}
