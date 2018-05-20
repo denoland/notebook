@@ -19,9 +19,9 @@
 // server-side so the results can be displayed even if javascript is disabled.
 
 import { Component, h } from "preact";
-import { Avatar } from "./components/avatar";
-import { docTitle, normalizeCode } from "./components/common";
+import { normalizeCode } from "./components/common";
 import { GlobalHeader } from "./components/header";
+import { NotebookList } from "./components/list";
 import { Loading } from "./components/loading";
 import { UserMenu } from "./components/menu";
 import { NewNotebookButton } from "./components/new_notebook_button";
@@ -238,6 +238,10 @@ export class MostRecent extends Component<MostRecentProps, MostRecentState> {
     window.location.href = nbUrl(nbId);
   }
 
+  private onOpenNotebook(nbId: string) {
+    window.location.href = nbUrl(nbId);
+  }
+
   render() {
     let profileLinkEl = null;
     if (this.props.userInfo) {
@@ -261,7 +265,11 @@ export class MostRecent extends Component<MostRecentProps, MostRecentState> {
             <NewNotebookButton onClick={this.onNewNotebook.bind(this)} />
           </div>
         </div>
-        <ol>{notebookList(this.props.mostRecent)}</ol>
+        <NotebookList
+          showTitle={false}
+          notebooks={this.props.mostRecent}
+          onOpen={this.onOpenNotebook.bind(this)}
+        />
       </div>
     );
   }
@@ -280,6 +288,10 @@ export class Profile extends Component<ProfileProps, ProfileState> {
     window.location.href = nbUrl(nbId);
   }
 
+  private onOpenNotebook(nbId: string) {
+    window.location.href = nbUrl(nbId);
+  }
+
   render() {
     if (this.props.profileLatest.length === 0) {
       return <h1>User has no notebooks</h1>;
@@ -295,67 +307,14 @@ export class Profile extends Component<ProfileProps, ProfileState> {
           <UserTitle userInfo={doc.owner} />
           <NewNotebookButton onClick={this.onNewNotebook.bind(this)} />
         </div>
-        <ol>
-          {notebookList(this.props.profileLatest, {
-            showDates: false,
-            showName: false,
-            showTitle: true
-          })}
-        </ol>
+        <NotebookList
+          showTitle={true}
+          notebooks={this.props.profileLatest}
+          onOpen={this.onOpenNotebook.bind(this)}
+        />
       </div>
     );
   }
-}
-
-function notebookList(
-  notebooks: types.NbInfo[],
-  { showName = true, showTitle = false, showDates = false } = {}
-): JSX.Element[] {
-  return notebooks.map(info => {
-    const snippit = db.getInputCodes(info.doc).join("\n\n");
-    const href = nbUrl(info.nbId);
-    return (
-      <a href={href}>
-        <li>
-          <div class="code-snippit">{snippit}</div>
-          {notebookBlurb(info.doc, { showName, showTitle, showDates })}
-        </li>
-      </a>
-    );
-  });
-}
-
-function notebookBlurb(
-  doc: types.NotebookDoc,
-  { showName = true, showTitle = false, showDates = false } = {}
-): JSX.Element {
-  let body = [];
-  if (showDates) {
-    body = body.concat([
-      <div class="date-created">
-        <p class="created">Created {fmtDate(doc.created)}</p>
-      </div>,
-      <div class="date-updated">
-        <p class="updated">Updated {fmtDate(doc.updated)}</p>
-      </div>
-    ]);
-  }
-  if (showName) {
-    body = body.concat([
-      <div class="blurb-avatar">
-        <Avatar userInfo={doc.owner} />
-      </div>,
-      <p class="blurb-name">{doc.owner.displayName}</p>
-    ]);
-  }
-  if (showTitle) {
-    body.push(<p class="blurb-title">{docTitle(doc.title)}</p>);
-  }
-  return <div class="blurb">{body}</div>;
-}
-
-function fmtDate(d: Date): string {
-  return d.toISOString();
 }
 
 function nbUrl(nbId: string): string {

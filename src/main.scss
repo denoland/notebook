@@ -637,49 +637,49 @@ header {
 .most-recent {
   margin: 0 auto;
   padding: 0 8px;
+}
 
-  ol {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    grid-column-gap: 16px;
-    grid-row-gap: 24px;
-    list-style-type: none;
-    padding: 0;
-    margin: 0 auto;
-    max-width: 960px;
+ol.notebooks-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-column-gap: 16px;
+  grid-row-gap: 24px;
+  list-style-type: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 960px;
 
-    li {
-      grid-column-start: auto;
-      grid-column-end: auto;
-      grid-row-start: auto;
-      grid-row-end: auto;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background-color: $cellBackground;
-      border: 1px solid $borderColor;
-      min-height: 240px;
+  li {
+    grid-column-start: auto;
+    grid-column-end: auto;
+    grid-row-start: auto;
+    grid-row-end: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: $cellBackground;
+    border: 1px solid $borderColor;
+    min-height: 240px;
 
-      &:hover,
-      &:focus,
-      &:active {
-        text-decoration: none;
-        background-color: $cellBackgroundFocus;
-      }
+    &:hover,
+    &:focus,
+    &:active {
+      text-decoration: none;
+      background-color: $cellBackgroundFocus;
+    }
 
-      p {
-        margin: 8px;
-        color: $base03;
-      }
+    p {
+      margin: 8px;
+      color: $base03;
+    }
 
-      .code-snippit {
-        max-height: 180px;
-        margin: 8px 8px 0 8px;
-        font-family: 'Roboto Mono', monospace;
-        white-space: pre;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+    .code-snippit {
+      max-height: 180px;
+      margin: 8px 8px 0 8px;
+      font-family: 'Roboto Mono', monospace;
+      white-space: pre;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }
