@@ -24,6 +24,7 @@ import { docTitle, normalizeCode } from "./components/common";
 import { GlobalHeader } from "./components/header";
 import { Loading } from "./components/loading";
 import { UserMenu } from "./components/menu";
+import { NewNotebookButton } from "./components/new_notebook_button";
 import { Notebook } from "./components/notebook";
 import { profileLink, UserTitle } from "./components/user_title";
 import * as db from "./db";
@@ -232,6 +233,11 @@ export interface MostRecentProps {
 export interface MostRecentState {}
 
 export class MostRecent extends Component<MostRecentProps, MostRecentState> {
+  private async onNewNotebook() {
+    const nbId = await db.active.create();
+    window.location.href = nbUrl(nbId);
+  }
+
   render() {
     let profileLinkEl = null;
     if (this.props.userInfo) {
@@ -251,27 +257,14 @@ export class MostRecent extends Component<MostRecentProps, MostRecentState> {
           <div class="most-recent-header-title">
             <h2>Recently Updated</h2>
           </div>
-          <div class="most-recent-header-cta">{newNotebookButton()}</div>
+          <div class="most-recent-header-cta">
+            <NewNotebookButton onClick={this.onNewNotebook.bind(this)} />
+          </div>
         </div>
         <ol>{notebookList(this.props.mostRecent)}</ol>
       </div>
     );
   }
-}
-
-function newNotebookButton() {
-  return (
-    <button
-      class="create-notebook"
-      onClick={async () => {
-        // Redirect to new notebook.
-        const nbId = await db.active.create();
-        window.location.href = nbUrl(nbId);
-      }}
-    >
-      + New Notebook
-    </button>
-  );
 }
 
 export interface ProfileProps {
@@ -282,6 +275,11 @@ export interface ProfileProps {
 export interface ProfileState {}
 
 export class Profile extends Component<ProfileProps, ProfileState> {
+  private async onNewNotebook() {
+    const nbId = await db.active.create();
+    window.location.href = nbUrl(nbId);
+  }
+
   render() {
     if (this.props.profileLatest.length === 0) {
       return <h1>User has no notebooks</h1>;
@@ -295,7 +293,7 @@ export class Profile extends Component<ProfileProps, ProfileState> {
       <div class="most-recent">
         <div class="most-recent-header">
           <UserTitle userInfo={doc.owner} />
-          {newNotebookButton()}
+          <NewNotebookButton onClick={this.onNewNotebook.bind(this)} />
         </div>
         <ol>
           {notebookList(this.props.profileLatest, {

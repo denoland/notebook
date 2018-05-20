@@ -14,19 +14,16 @@
  */
 
 import { h } from "preact";
-// TODO None of component in ./src/components should depend on ./src/db.ts.
-import * as db from "../db";
-import { nbUrl } from "./common";
 
-export function newNotebookButton(): JSX.Element {
+export interface NewNotebookButtonProps {
+  onClick: () => void;
+}
+
+export function NewNotebookButton(props: NewNotebookButtonProps): JSX.Element {
   return (
     <button
       class="create-notebook"
-      onClick={async () => {
-        // Redirect to new notebook.
-        const nbId = await db.active.create();
-        window.location.href = nbUrl(nbId);
-      }}
+      onClick={() => props.onClick && props.onClick()}
     >
       + New Notebook
     </button>
