@@ -21,13 +21,11 @@
 import { Component, h } from "preact";
 import { normalizeCode } from "./components/common";
 import { GlobalHeader } from "./components/header";
-import { NotebookList } from "./components/list";
 import { Loading } from "./components/loading";
 import { UserMenu } from "./components/menu";
-import { NewNotebookButton } from "./components/new_notebook_button";
 import { Notebook } from "./components/notebook";
 import { Profile } from "./components/profile";
-import { profileLink } from "./components/user_title";
+import { Recent } from "./components/recent";
 import * as db from "./db";
 import * as types from "./types";
 
@@ -217,9 +215,11 @@ export class NotebookRoot extends Component<
       );
     } else if (this.state.mostRecent) {
       body = (
-        <MostRecent
-          mostRecent={this.state.mostRecent}
+        <Recent
+          notebooks={this.state.mostRecent}
           userInfo={this.props.userInfo}
+          onNewNotebook={this.onNewNotebook.bind(this)}
+          onOpenNotebook={this.onOpenNotebook.bind(this)}
         />
       );
     } else {
@@ -232,56 +232,6 @@ export class NotebookRoot extends Component<
           <UserMenu userInfo={this.props.userInfo} />
         </GlobalHeader>
         {body}
-      </div>
-    );
-  }
-}
-
-export interface MostRecentProps {
-  mostRecent: types.NbInfo[];
-  userInfo?: types.UserInfo;
-}
-
-export interface MostRecentState {}
-
-export class MostRecent extends Component<MostRecentProps, MostRecentState> {
-  private async onNewNotebook() {
-    const nbId = await db.active.create();
-    window.location.href = nbUrl(nbId);
-  }
-
-  private onOpenNotebook(nbId: string) {
-    window.location.href = nbUrl(nbId);
-  }
-
-  render() {
-    let profileLinkEl = null;
-    if (this.props.userInfo) {
-      // TODO This is ugly - we're reusing most-recent-header just to get a line
-      // break between the link to "Your Notebooks" and "Most Recent".
-      profileLinkEl = (
-        <div class="most-recent-header">
-          <h2>{profileLink(this.props.userInfo, "Your Notebooks")}</h2>
-        </div>
-      );
-    }
-
-    return (
-      <div class="most-recent">
-        {profileLinkEl}
-        <div class="most-recent-header">
-          <div class="most-recent-header-title">
-            <h2>Recently Updated</h2>
-          </div>
-          <div class="most-recent-header-cta">
-            <NewNotebookButton onClick={this.onNewNotebook.bind(this)} />
-          </div>
-        </div>
-        <NotebookList
-          showTitle={false}
-          notebooks={this.props.mostRecent}
-          onOpen={this.onOpenNotebook.bind(this)}
-        />
       </div>
     );
   }
