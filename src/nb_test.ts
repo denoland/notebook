@@ -126,7 +126,7 @@ testBrowser(async function notebook_profile() {
   await renderProfile("non-existant");
   let avatars = document.querySelectorAll(".avatar");
   assert(avatars.length === 0);
-  let notebooks = document.querySelectorAll(".most-recent ol li");
+  let notebooks = document.querySelectorAll(".nb-listing ol li");
   assert(notebooks.length === 0);
   assertEqual(mdb.counts, { queryProfile: 1 });
 
@@ -134,7 +134,7 @@ testBrowser(async function notebook_profile() {
   await renderProfile(db.defaultOwner.uid);
   avatars = document.querySelectorAll(".avatar");
   assert(avatars.length === 1);
-  notebooks = document.querySelectorAll(".most-recent ol li");
+  notebooks = document.querySelectorAll(".nb-listing ol li");
   assert(notebooks.length === 1);
   assertEqual(mdb.counts, { queryProfile: 2 });
 });

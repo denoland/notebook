@@ -51,20 +51,20 @@ export class Recent extends Component<RecentProps, RecentState> {
     let profileLinkEl = null;
     if (this.props.userInfo) {
       profileLinkEl = (
-        <div class="most-recent-header">
+        <div class="nb-listing-header">
           <h2>{profileLink(this.props.userInfo, "Your Notebooks")}</h2>
         </div>
       );
     }
 
     return (
-      <div class="most-recent">
+      <div class="nb-listing">
         {profileLinkEl}
-        <div class="most-recent-header">
-          <div class="most-recent-header-title">
+        <div class="nb-listing-header">
+          <div class="nb-listing-header-title">
             <h2>Recently Updated</h2>
           </div>
-          <div class="most-recent-header-cta">
+          <div class="nb-listing-header-cta">
             <NewNotebookButton onClick={this.onNewNotebook.bind(this)} />
           </div>
         </div>

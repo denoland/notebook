@@ -35,7 +35,7 @@ export interface UserTitleProps {
 
 export function UserTitle(props: UserTitleProps): JSX.Element {
   return (
-    <div class="most-recent-header-title">
+    <div class="nb-listing-header-title">
       <Avatar userInfo={props.userInfo} />
       <h2>{profileLink(props.userInfo)}</h2>
     </div>

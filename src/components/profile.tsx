@@ -46,12 +46,9 @@ export class Profile extends Component<ProfileProps, {}> {
     }
     const doc = this.props.notebooks[0].doc;
 
-    // TODO Profile is reusing the most-recent css class, because it's a very
-    // similar layout. The CSS class should be renamed something appropriate
-    // for both of them, maybe nb-listing.
     return (
-      <div class="most-recent">
-        <div class="most-recent-header">
+      <div class="nb-listing">
+        <div class="nb-listing-header">
           <UserTitle userInfo={doc.owner} />
           <NewNotebookButton onClick={this.onNewNotebook.bind(this)} />
         </div>

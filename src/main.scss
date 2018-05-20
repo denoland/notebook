@@ -634,7 +634,7 @@ header {
   margin: 0 auto $size3 auto;
 }
 
-.most-recent {
+.nb-listing {
   margin: 0 auto;
   padding: 0 8px;
 }
@@ -684,14 +684,14 @@ ol.notebooks-list {
   }
 }
 
-.most-recent-header {
+.nb-listing-header {
   display: grid;
   grid-template-columns: auto auto;
   justify-content: space-between;
   max-width: 960px;
   margin: 0 auto;
 
-  .most-recent-header-cta {
+  .nb-listing-header-cta {
     display: grid;
     align-content: center;
 
@@ -701,7 +701,7 @@ ol.notebooks-list {
   }
 }
 
-.most-recent-header-title {
+.nb-listing-header-title {
   display: flex;
 }
 
@@ -752,7 +752,7 @@ ol.notebooks-list {
 
 // Mobile first. No desktop related things above this line.
 @media (max-width: 1100px) {
-  .most-recent {
+  .nb-listing {
     max-width: 640px;
   }
 }
