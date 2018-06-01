@@ -1,3 +1,3 @@
-Propel Notebook
+Propel
 
-https://github.com/propelml/notebook
+Go to the [notebook](/notebook).
