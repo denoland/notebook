@@ -3203,6 +3203,10 @@ markdown-table@^1.1.0:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/markdown-table/-/markdown-table-1.1.2.tgz#c78db948fa879903a41bce522e3b96f801c63786"
 
+marked@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-0.4.0.tgz#9ad2c2a7a1791f10a852e0112f77b571dce10c66"
+
 math-expression-evaluator@^1.2.14:
   version "1.2.17"
   resolved "https://registry.yarnpkg.com/math-expression-evaluator/-/math-expression-evaluator-1.2.17.tgz#de819fdbcd84dccd8fae59c6aeb79615b9d266ac"
@@ -3804,6 +3808,13 @@ parcel-bundler@^1.8.1:
     uglify-es "^3.2.1"
     v8-compile-cache "^2.0.0"
     ws "^5.1.1"
+
+parcel-plugin-markdown@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/parcel-plugin-markdown/-/parcel-plugin-markdown-0.3.1.tgz#2e6dad68347c71c62abc5a67e0e38dc680b215f2"
+  dependencies:
+    marked "^0.4.0"
+    parcel-bundler "^1.8.1"
 
 parse-asn1@^5.0.0:
   version "5.1.1"

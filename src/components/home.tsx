@@ -12,14 +12,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-import { readFileSync } from "fs";
 import { h } from "preact";
 import { GlobalHeader } from "./header";
 
 // tslint:disable-next-line:variable-name
 export const Home = props => {
-  let md = readFileSync(__dirname + "/../../README.md", "utf8");
-  md = "<p>" + md.replace(/\n\n/g, "\n\n<p>");
+  const md = require("../../README.md");
   return (
     <div class="index">
       <GlobalHeader />
