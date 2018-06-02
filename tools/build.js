@@ -53,6 +53,9 @@ function makeBundle(options = {}) {
   run.mkdir("build");
   run.mkdir(wdir);
 
+  // Create CNAME file to tell github pages about our custom domain.
+  fs.writeFileSync(`${wdir}/CNAME`, "propelml.org");
+
   if (!options.production) {
     // The symlink to the source repository root is only needed for tests.
     run.symlink(run.root, wdir + "repo");
