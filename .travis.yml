@@ -16,6 +16,7 @@ node_js:
 - '8.8'
 script:
 - "./tools/presubmit.js"
+after_success:
 - "./tools/deploy_github_pages.js"
 env:
   global:
