@@ -184,7 +184,8 @@ export function isNumericalKey(key: string): boolean {
 }
 
 export function isTensor(value: any): boolean {
-  return typeof value === "object" &&
+  return value &&
+         typeof value === "object" &&
          typeof value.dtype === "string" &&
          typeof value.dataSync === "function" &&
          Array.isArray(value.shape);
