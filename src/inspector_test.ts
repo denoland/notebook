@@ -8,6 +8,7 @@ import { assertEqual } from "./util";
 class Tensor {
   dtype = "int32";
   shape = [3, 3];
+  dataSync() {}
   toString() {
     return [
       "Tensor",
