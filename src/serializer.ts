@@ -16,7 +16,7 @@
 import { isNumericalKey, isTensor } from "./util";
 
 export interface AtomDescriptor {
-  type: "null" | "undefined" | "getter" | "gettersetter" | "setter";
+  type: "null" | "undefined" | "error" | "getter" | "gettersetter" | "setter";
 }
 export interface PrimitiveDescriptor {
   type: "boolean" | "date" | "number" | "regexp" | "string" | "symbol";
@@ -83,6 +83,7 @@ export interface InspectorOptions {
 }
 
 class Placeholder {
+  static error = new Placeholder("error");
   static getter = new Placeholder("getter");
   static gettersetter = new Placeholder("gettersetter");
   static setter = new Placeholder("setter");
@@ -128,7 +129,11 @@ class DescriptionBuilder {
       id = this.descriptorCount++;
       this.valueMap.set(value, id);
       // Create a new descriptor.
-      this.descriptors[id] = this.createDescriptor(value);
+      try {
+        this.descriptors[id] = this.createDescriptor(value);
+      } catch (e) {
+        this.descriptors[id] = this.createDescriptor(Placeholder.error);
+      }
     }
     return id;
   }

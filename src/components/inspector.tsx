@@ -82,6 +82,8 @@ export class Inspector extends Component<InspectorData, {}> {
         return [<span class="cm-atom">{d.value}</span>];
       case "date":
         return [<span class="cm-string-2">{d.value}</span>];
+      case "error":
+        return [<span class="cm-keyword">[error]</span>];
       case "getter":
         return [<span class="cm-keyword">[getter]</span>];
       case "gettersetter":
