@@ -16,6 +16,7 @@
 import * as test_internals from "./test_internals";
 
 import { fetchArrayBuffer } from "./fetch";
+import * as matplotlib from "./matplotlib";
 import { Transpiler } from "./nb_transpiler";
 import { setOutputHandler } from "./output_handler";
 import { RPC, WindowRPC } from "./rpc";
@@ -33,6 +34,7 @@ const moduleCache: { [name: string]: any } = Object.create(null);
 async function importModule(target: string) {
   // Check whether module is a built-in.
   switch (target) {
+    case "matplotlib": return matplotlib;
     case "test_internals": return test_internals;
   }
 
