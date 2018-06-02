@@ -183,6 +183,13 @@ export function isNumericalKey(key: string): boolean {
   );
 }
 
+export function isTensor(value: any): boolean {
+  return typeof value === "object" &&
+         typeof value.dtype === "string" &&
+         typeof value.dataSync === "function" &&
+         Array.isArray(value.shape);
+}
+
 export function tmpdir(): string {
   return process.env.TEMP || process.env.TMPDIR || "/tmp";
 }

@@ -13,7 +13,7 @@
    limitations under the License.
  */
 
-import { isNumericalKey } from "./util";
+import { isNumericalKey, isTensor } from "./util";
 
 export interface AtomDescriptor {
   type: "null" | "undefined" | "getter" | "gettersetter" | "setter";
@@ -163,8 +163,7 @@ class DescriptionBuilder {
 
     // Some helper variables that we need later to decide which keys to skip.
     const valueIsBoxedString = value instanceof String;
-    const valueIsTensor =
-      typeof value.dtype === "string" && Array.isArray(value.shape);
+    const valueIsTensor = isTensor(value);
 
     // Capture the name of the constructor.
     if (proto === null) {
