@@ -34,8 +34,10 @@ const moduleCache: { [name: string]: any } = Object.create(null);
 async function importModule(target: string) {
   // Check whether module is a built-in.
   switch (target) {
-    case "matplotlib": return matplotlib;
-    case "test_internals": return test_internals;
+    case "matplotlib":
+      return matplotlib;
+    case "test_internals":
+      return test_internals;
   }
 
   // Normalize the URL, and check that it is fully-qualified, otherwise we might

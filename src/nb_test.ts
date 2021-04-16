@@ -89,14 +89,14 @@ testBrowser(async function notebook_progressBar() {
   assertEqual(percent(), 0);
   // Make progress on both jobs.
   await downloadProgress("job1", 1e3, 10e3);
-  assertEqual(percent(), 100 * 1e3 / 40e3);
+  assertEqual(percent(), (100 * 1e3) / 40e3);
   await downloadProgress("job2", 1e3, 30e3);
-  assertEqual(percent(), 100 * 2e3 / 40e3);
+  assertEqual(percent(), (100 * 2e3) / 40e3);
   await downloadProgress("job2", 15e3, 30e3);
-  assertEqual(percent(), 100 * 16e3 / 40e3);
+  assertEqual(percent(), (100 * 16e3) / 40e3);
   // Set job1 to 100% from cellId 2.
   await downloadProgress("job1", 10e3, 10e3, 2);
-  assertEqual(percent(), 100 * 25e3 / 40e3);
+  assertEqual(percent(), (100 * 25e3) / 40e3);
   // Finish job1.
   await downloadProgress("job1", null, null);
   // Since job1 is no longer active, and job2 is half done, the progress bar
@@ -115,7 +115,7 @@ testBrowser(async function notebook_progressBar() {
 });
 
 testBrowser(async function notebook_title() {
-  const originalTitle = document.title = "Propel tests";
+  const originalTitle = (document.title = "Propel tests");
   await delay(0); // Yield to allow document title to be updated.
   await renderNotebook();
   assertEqual(document.title, `${originalTitle} | ${DOC_TITLE}`);
@@ -166,18 +166,24 @@ testBrowser(async function notebook_urlImport() {
   const { notebookRef } = await renderAnonNotebook();
   const testdataUrl = `${location.origin}/repo/src/testdata`;
 
-  const cell1 = await notebookRef.insertCell(1, `
+  const cell1 = await notebookRef.insertCell(
+    1,
+    `
     import { assert, assertEqual } from "test_internals";
     import * as vegalite from "${testdataUrl}/vega-lite@2.js";
     import * as tf from "${testdataUrl}/tfjs@0.10.0.js";
     assertEqual(typeof vegalite.compile, "function");
     const t = tf.ones([5, 5]);
-    assertEqual(t.shape, [5, 5])`);
+    assertEqual(t.shape, [5, 5])`
+  );
   await notebookRef.onRun(cell1);
 
-  const cell2 = await notebookRef.insertCell(2, `
+  const cell2 = await notebookRef.insertCell(
+    2,
+    `
     import * as tf2 from "${testdataUrl}/tfjs@0.10.0.js";
-    assertEqual(tf, tf2);`);
+    assertEqual(tf, tf2);`
+  );
   await notebookRef.onRun(cell2);
 });
 
@@ -229,7 +235,7 @@ async function renderNotebook(): Promise<Notebook> {
       created: new Date(),
       owner: {
         displayName: "Anonymous",
-        photoURL: require("./img/anon_profile.png"),
+        photoURL: require("url:./img/anon_profile.png"),
         uid: ""
       },
       title: DOC_TITLE,

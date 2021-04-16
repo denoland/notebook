@@ -23,6 +23,6 @@ export function docTitle(title: string): string {
 }
 
 export function nbUrl(nbId: string): string {
-  const u = window.location.origin + "/notebook?nbId=" + nbId;
+  const u = window.location.origin + "/propel/notebook?nbId=" + nbId;
   return u;
 }

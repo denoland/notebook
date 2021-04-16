@@ -172,11 +172,10 @@ async function runTest(browser, port, { path, doneMsg, timeout }: Test) {
   }
 
   function onMessage(msg) {
-    const values = msg.args.map(
-      v =>
-        v._remoteObject.value !== undefined
-          ? v._remoteObject.value
-          : `[[${v._remoteObject.type}]]`
+    const values = msg.args.map(v =>
+      v._remoteObject.value !== undefined
+        ? v._remoteObject.value
+        : `[[${v._remoteObject.type}]]`
     );
     const text = format.apply(null, values);
 

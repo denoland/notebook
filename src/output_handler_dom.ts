@@ -24,7 +24,7 @@ import {
   InspectorData,
   OutputHandler,
   PlotData,
-  Progress,
+  Progress
 } from "./output_handler";
 
 const progressOutputHandlerMap = new Map<string, OutputHandler>();
@@ -92,7 +92,10 @@ export class OutputHandlerDOM implements OutputHandler {
         }
       ],
 
-      axes: [{ orient: "bottom", scale: "x" }, { orient: "left", scale: "y" }],
+      axes: [
+        { orient: "bottom", scale: "x" },
+        { orient: "left", scale: "y" }
+      ],
 
       marks: [
         {
@@ -186,7 +189,7 @@ export class OutputHandlerDOM implements OutputHandler {
     }
 
     // Avoid division by zero.
-    const percent = sumTotal > 0 ? sumLoaded / sumTotal * 100 : 0;
+    const percent = sumTotal > 0 ? (sumLoaded / sumTotal) * 100 : 0;
     progressBar.style.display = "block";
     progressBar.style.width = `${percent}%`;
   }

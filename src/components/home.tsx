@@ -16,14 +16,18 @@ import { h } from "preact";
 import { GlobalHeader } from "./header";
 
 // tslint:disable-next-line:variable-name
-export const Home = props => {
-  const md = require("../../README.md");
+export const Home = (props) => {
+  // const md = require("url:../../README.md");
   return (
     <div class="index">
       <GlobalHeader />
       <div class="intro flex-row">
         <div class="flex-cell">
-          <div dangerouslySetInnerHTML={{ __html: md }} />
+          <div>
+            <p>
+              Go to the <a href="/propel/notebook/">notebook</a>
+            </p>
+          </div>
         </div>
       </div>
     </div>

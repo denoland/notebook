@@ -4,9 +4,10 @@
   "license": "Apache-2.0",
   "private": true,
   "engines": {
-    "node": ">=8.6.0"
+    "node": ">=12"
   },
   "scripts": {
+    "build": "parcel build --public-url=/propel/ --log-level=info --dist-dir=build src/index.html src/notebook.html src/sandbox.ts",
     "fmt": "prettier --write src/*.ts* tools/*",
     "lint": "tslint --project tsconfig.json",
     "test": "./tools/presubmit.js"
@@ -16,6 +17,8 @@
     "url": "git+https://github.com/propelml/notebook.git"
   },
   "devDependencies": {
+    "@parcel/transformer-image": "2.0.0-beta.2",
+    "@parcel/transformer-sass": "2.0.0-beta.2",
     "@types/acorn": "^4.0.3",
     "@types/codemirror": "0.0.51",
     "@types/node": "^8.9.4",
@@ -25,7 +28,7 @@
     "ncp": "^2.0.0",
     "node-fetch": "^1.7.3",
     "node-sass": "^4.9.0",
-    "parcel-bundler": "^1.8.1",
+    "parcel": "^2.0.0-beta.2",
     "parcel-plugin-markdown": "^0.3.1",
     "preact": "^8.2.7",
     "prettier": "^1.12.1",

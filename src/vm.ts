@@ -26,7 +26,7 @@ function createIframe(rpcChannelId): HTMLIFrameElement {
         <meta charset="utf-8"/>
         <meta name="rpc-channel-id" content="${escape(rpcChannelId)}"/>
         <base href="${escape(base)}">
-        <script async type="text/javascript" src="/sandbox.js">
+        <script async type="text/javascript" src="/propel/sandbox.js">
         </script>
       </head>
       <body>
@@ -97,6 +97,6 @@ export function createRPCHandler(lookupCell: LookupCell) {
       const oh = lookupCell(cellId);
       if (!oh) return;
       oh.downloadProgress(data);
-    }
+    },
   };
 }

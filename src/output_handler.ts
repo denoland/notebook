@@ -11,7 +11,7 @@
    limitations under the License.
 */
 
-import { InspectorData } from "./serializer";
+import type { InspectorData } from "./serializer";
 
 export type InspectorData = InspectorData;
 export type PlotData = Array<Array<{ x: number; y: number }>>;

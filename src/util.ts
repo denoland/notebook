@@ -184,11 +184,13 @@ export function isNumericalKey(key: string): boolean {
 }
 
 export function isTensor(value: any): boolean {
-  return value &&
-         typeof value === "object" &&
-         typeof value.dtype === "string" &&
-         typeof value.dataSync === "function" &&
-         Array.isArray(value.shape);
+  return (
+    value &&
+    typeof value === "object" &&
+    typeof value.dtype === "string" &&
+    typeof value.dataSync === "function" &&
+    Array.isArray(value.shape)
+  );
 }
 
 export function tmpdir(): string {

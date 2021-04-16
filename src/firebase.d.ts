@@ -574,7 +574,7 @@ declare namespace firebase.storage {
         | null
         | ((a: Object) => any),
       error?: ((a: Error) => any) | null,
-      complete?: (firebase.Unsubscribe) | null
+      complete?: firebase.Unsubscribe | null
     ): Function;
     pause(): boolean;
     resume(): boolean;

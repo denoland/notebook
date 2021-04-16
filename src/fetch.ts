@@ -166,7 +166,7 @@ export function downloadProgress(
     if (now - lastProgress > 500) {
       // TODO: when multiple downloads are active, percentages currently
       // write over one another.
-      const p = (loaded / total * 100).toFixed(2);
+      const p = ((loaded / total) * 100).toFixed(2);
       process.stdout.write(`${p}% \r`);
       lastProgress = now;
     }

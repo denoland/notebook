@@ -15,7 +15,7 @@ const run = require("./run");
 const fs = require("fs");
 const http = require("http");
 const path = require("path");
-const Bundler = require("parcel-bundler");
+const Bundler = require("@parcel/core").default;
 const url = require("url");
 
 exports.build = build;
@@ -62,24 +62,26 @@ function makeBundle(options = {}) {
   }
 
   options = {
-    autoinstall: false,
-    cache: true,
-    hmr: false,
+    defaultConfig: require.resolve("@parcel/config-default"),
+    defaultTargetOptions: {
+      sourceMaps: !options.production,
+      engines: {
+        browsers: ["last 1 Chrome version"]
+      },
+      publicUrl: "/propel/",
+      distDir: wdir
+    },
     logLevel: process.env.CI ? 1 : 3,
-    minify: !!options.production,
-    outDir: wdir,
-    publicUrl: "/",
-    sourceMaps: !options.production,
-    watch: false,
+    mode: options.production ? "production" : "development",
     ...options
   };
 
-  const entryPoints = ["src/index.html", "src/notebook.html", "src/sandbox.ts"];
+  const entries = ["src/index.html", "src/notebook.html", "src/sandbox.ts"];
   if (!options.production) {
-    entryPoints.push("src/test.html");
+    entries.push("src/test.html");
   }
 
-  return new Bundler(entryPoints, options);
+  return new Bundler({ entries, ...options });
 }
 
 function buildAndServe(options = {}) {
@@ -108,5 +110,5 @@ function buildAndServe(options = {}) {
 }
 
 function build(options = {}) {
-  makeBundle(options).bundle();
+  makeBundle(options).run();
 }

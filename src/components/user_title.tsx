@@ -19,9 +19,9 @@ import { Avatar } from "./avatar";
 
 export function profileLink(
   u: types.UserInfo,
-  text: string = null
+  text: string = null,
 ): JSX.Element {
-  const href = window.location.origin + "/notebook?profile=" + u.uid;
+  const href = window.location.origin + "/propel/notebook?profile=" + u.uid;
   return (
     <a class="profile-link" href={href}>
       {text ? text : u.displayName}

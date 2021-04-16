@@ -9,8 +9,7 @@ if (!GH_TOKEN) {
 
 const SOURCE_REMOTE = "origin";
 const SOURCE_BRANCH = "master";
-const DEPLOY_REMOTE =
-  `https://${GH_TOKEN}@github.com/propelml/propelml.github.io`;
+const DEPLOY_REMOTE = `https://${GH_TOKEN}@github.com/propelml/propelml.github.io`;
 const DEPLOY_BRANCH = "master";
 
 const COMMIT_NAME = "Propel deploy bot";
