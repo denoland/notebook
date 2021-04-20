@@ -7,14 +7,15 @@
     "node": ">=12"
   },
   "scripts": {
-    "build": "parcel build --public-url=/propel/ --log-level=info --dist-dir=build src/index.html src/notebook.html src/sandbox.ts",
+    "build": "parcel build --public-url=/propel/ --log-level=info --no-source-maps --dist-dir=build src/index.html src/notebook.html src/sandbox.ts",
+    "dev": "parcel serve --dist-dir=build src/index.html src/notebook.html src/sandbox.ts",
     "fmt": "prettier --write src/*.ts* tools/*",
     "lint": "tslint --project tsconfig.json",
     "test": "./tools/presubmit.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/propelml/notebook.git"
+    "url": "git+https://github.com/denoland/notebook.git"
   },
   "devDependencies": {
     "@parcel/transformer-image": "2.0.0-beta.2",
@@ -50,5 +51,8 @@
   },
   "browserslist": [
     ">5%"
-  ]
+  ],
+  "dependencies": {
+    "firebase": "^8.4.1"
+  }
 }

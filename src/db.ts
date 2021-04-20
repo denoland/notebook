@@ -18,9 +18,9 @@
 // These routines are run only on the browser.
 import { NbInfo, NotebookDoc, UserInfo } from "./types";
 import { assert } from "./util";
-
-// tslint:disable:no-reference
-/// <reference path="firebase.d.ts" />
+import firebase from "firebase/app";
+import "firebase/firestore";
+import "firebase/auth";
 
 export interface Database {
   getDoc(nbId): Promise<NotebookDoc>;
