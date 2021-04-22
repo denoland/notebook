@@ -18,9 +18,9 @@
 // These routines are run only on the browser.
 import { NbInfo, NotebookDoc, UserInfo } from "./types";
 import { assert } from "./util";
-import firebase from "firebase/app";
-import "firebase/firestore";
-import "firebase/auth";
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
+import { getAuth, onAuthStateChanged, Auth, signInWithPopup, GithubAuthProvider } from "firebase/auth";
 
 export interface Database {
   getDoc(nbId): Promise<NotebookDoc>;
@@ -29,7 +29,7 @@ export interface Database {
   create(): Promise<string>;
   queryProfile(uid: string, limit: number): Promise<NbInfo[]>;
   queryLatest(): Promise<NbInfo[]>;
-  signIn(): void;
+  signIn(): Promise<void>;
   signOut(): void;
   subscribeAuthChange(cb: (user: UserInfo) => void): UnsubscribeCb;
 }
@@ -41,7 +41,7 @@ export interface UnsubscribeCb {
 // These are shared by all functions and are lazily constructed by lazyInit.
 let db: firebase.firestore.Firestore;
 let nbCollection: firebase.firestore.CollectionReference;
-let auth: firebase.auth.Auth;
+let auth: Auth;
 const firebaseConfig = {
   apiKey: "AIzaSyAc5XVKd27iXdGf1ZEFLWudZbpFg3nAwjQ",
   authDomain: "propel-ml.firebaseapp.com",
@@ -157,10 +157,10 @@ class DatabaseFB implements Database {
     return out.reverse();
   }
 
-  signIn() {
+  async signIn() {
     lazyInit();
-    const provider = new firebase.auth.GithubAuthProvider();
-    auth.signInWithPopup(provider);
+    const provider = new GithubAuthProvider()
+    await signInWithPopup(auth, provider);
   }
 
   signOut() {
@@ -170,7 +170,7 @@ class DatabaseFB implements Database {
 
   subscribeAuthChange(cb: (user: UserInfo) => void): UnsubscribeCb {
     lazyInit();
-    return auth.onAuthStateChanged(cb);
+    return onAuthStateChanged(auth, cb);
   }
 }
 
@@ -275,10 +275,11 @@ export function ownsDoc(userInfo: UserInfo, doc: NotebookDoc): boolean {
 
 function lazyInit() {
   if (db == null) {
-    firebase.initializeApp(firebaseConfig);
+    const firebaseApp = firebase.initializeApp(firebaseConfig);
+    // const firebaseApp = initializeApp(firebaseConfig);
     db = firebase.firestore();
     // firebase.firestore.setLogLevel("debug");
-    auth = firebase.auth();
+    auth = getAuth(firebaseApp);
     nbCollection = db.collection("notebooks");
   }
   return true;
