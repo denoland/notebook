@@ -18,9 +18,29 @@
 // These routines are run only on the browser.
 import { NbInfo, NotebookDoc, UserInfo } from "./types";
 import { assert } from "./util";
-import firebase from "firebase/app";
-import "firebase/firestore";
-import "firebase/auth";
+import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  onAuthStateChanged,
+  Auth,
+  signInWithPopup,
+  GithubAuthProvider
+} from "firebase/auth";
+import {
+  FirebaseFirestore,
+  CollectionReference,
+  collection,
+  getFirestore,
+  doc,
+  getDoc,
+  addDoc,
+  updateDoc,
+  orderBy,
+  limit,
+  query,
+  getDocs,
+  where
+} from "firebase/firestore";
 
 export interface Database {
   getDoc(nbId): Promise<NotebookDoc>;
@@ -29,7 +49,7 @@ export interface Database {
   create(): Promise<string>;
   queryProfile(uid: string, limit: number): Promise<NbInfo[]>;
   queryLatest(): Promise<NbInfo[]>;
-  signIn(): void;
+  signIn(): Promise<void>;
   signOut(): void;
   subscribeAuthChange(cb: (user: UserInfo) => void): UnsubscribeCb;
 }
@@ -39,9 +59,9 @@ export interface UnsubscribeCb {
 }
 
 // These are shared by all functions and are lazily constructed by lazyInit.
-let db: firebase.firestore.Firestore;
-let nbCollection: firebase.firestore.CollectionReference;
-let auth: firebase.auth.Auth;
+let db: FirebaseFirestore;
+let nbCollection: CollectionReference;
+let auth: Auth;
 const firebaseConfig = {
   apiKey: "AIzaSyAc5XVKd27iXdGf1ZEFLWudZbpFg3nAwjQ",
   authDomain: "propel-ml.firebaseapp.com",
@@ -58,8 +78,8 @@ class DatabaseFB implements Database {
     if (nbId === "default") {
       return defaultDoc;
     }
-    const docRef = nbCollection.doc(nbId);
-    const snap = await docRef.get();
+    const docRef = doc(db, "notebooks", nbId);
+    const snap = await getDoc(docRef);
     if (snap.exists) {
       return snap.data() as NotebookDoc;
     } else {
@@ -68,13 +88,13 @@ class DatabaseFB implements Database {
   }
 
   // Caller must catch errors.
-  async updateDoc(nbId: string, doc: NotebookDoc): Promise<void> {
+  async updateDoc(nbId: string, document: NotebookDoc): Promise<void> {
     if (nbId === "default") return; // Don't save the default doc.
-    if (!ownsDoc(auth.currentUser, doc)) return;
-    const docRef = nbCollection.doc(nbId);
-    await docRef.update({
-      cells: doc.cells,
-      title: doc.title || "",
+    if (!ownsDoc(auth.currentUser, document)) return;
+    const docRef = doc(db, "notebooks", nbId);
+    await updateDoc(docRef, {
+      cells: document.cells,
+      title: document.title || "",
       updated: firebase.firestore.FieldValue.serverTimestamp()
     });
   }
@@ -103,7 +123,7 @@ class DatabaseFB implements Database {
       updated: firebase.firestore.FieldValue.serverTimestamp()
     };
     console.log({ newDoc });
-    const docRef = await nbCollection.add(newDoc);
+    const docRef = await addDoc(nbCollection, newDoc);
     return docRef.id;
   }
 
@@ -124,14 +144,14 @@ class DatabaseFB implements Database {
       updated: firebase.firestore.FieldValue.serverTimestamp()
     };
     console.log({ newDoc });
-    const docRef = await nbCollection.add(newDoc);
+    const docRef = await addDoc(nbCollection, newDoc);
     return docRef.id;
   }
 
   async queryLatest(): Promise<NbInfo[]> {
     lazyInit();
-    const query = nbCollection.orderBy("updated", "desc").limit(100);
-    const snapshots = await query.get();
+    const q = query(nbCollection, orderBy("updated", "desc"), limit(100));
+    const snapshots = await getDocs(q);
     const out = [];
     snapshots.forEach(snap => {
       const nbId = snap.id;
@@ -141,13 +161,16 @@ class DatabaseFB implements Database {
     return out.reverse();
   }
 
-  async queryProfile(uid: string, limit: number): Promise<NbInfo[]> {
+  async queryProfile(uid: string, queryLimit: number): Promise<NbInfo[]> {
     lazyInit();
-    const query = nbCollection
-      .orderBy("updated", "desc")
-      .where("owner.uid", "==", uid)
-      .limit(limit);
-    const snapshots = await query.get();
+    const q = query(
+      nbCollection,
+      orderBy("updated", "desc"),
+      where("owner.uid", "==", uid),
+      limit(queryLimit)
+    );
+
+    const snapshots = await getDocs(q);
     const out = [];
     snapshots.forEach(snap => {
       const nbId = snap.id;
@@ -157,10 +180,10 @@ class DatabaseFB implements Database {
     return out.reverse();
   }
 
-  signIn() {
+  async signIn() {
     lazyInit();
-    const provider = new firebase.auth.GithubAuthProvider();
-    auth.signInWithPopup(provider);
+    const provider = new GithubAuthProvider();
+    await signInWithPopup(auth, provider);
   }
 
   signOut() {
@@ -170,7 +193,7 @@ class DatabaseFB implements Database {
 
   subscribeAuthChange(cb: (user: UserInfo) => void): UnsubscribeCb {
     lazyInit();
-    return auth.onAuthStateChanged(cb);
+    return onAuthStateChanged(auth, cb);
   }
 }
 
@@ -228,7 +251,7 @@ export class DatabaseMock implements Database {
     return [];
   }
 
-  signIn(): void {
+  async signIn() {
     this.inc("signIn");
     this.currentUser = defaultOwner;
     this.makeAuthChangeCallbacks();
@@ -275,11 +298,10 @@ export function ownsDoc(userInfo: UserInfo, doc: NotebookDoc): boolean {
 
 function lazyInit() {
   if (db == null) {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    // firebase.firestore.setLogLevel("debug");
-    auth = firebase.auth();
-    nbCollection = db.collection("notebooks");
+    const firebaseApp = initializeApp(firebaseConfig);
+    db = getFirestore(firebaseApp);
+    auth = getAuth(firebaseApp);
+    nbCollection = collection(db, "notebooks");
   }
   return true;
 }

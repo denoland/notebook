@@ -32,7 +32,7 @@ export function Avatar(props: AvatarProps): JSX.Element {
       height={size}
       src={photo.href}
       width={size}
-      crossorigin
+      crossOrigin="anonymous"
     />
   );
 }
