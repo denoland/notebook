@@ -98,5 +98,10 @@ export function createRPCHandler(lookupCell: LookupCell) {
       if (!oh) return;
       oh.downloadProgress(data);
     },
+
+    async fetch(url: string): Promise<string> {
+      const response = await fetch(url);
+      return await response.text();
+    }
   };
 }

@@ -15,7 +15,6 @@
 
 import * as test_internals from "./test_internals";
 
-import { fetchArrayBuffer } from "./fetch";
 import * as matplotlib from "./matplotlib";
 import { Transpiler } from "./nb_transpiler";
 import { setOutputHandler } from "./output_handler";
@@ -23,55 +22,51 @@ import { RPC, WindowRPC } from "./rpc";
 import { describe, InspectorData, InspectorOptions } from "./serializer";
 import { global, globalEval, URL } from "./util";
 
-async function fetchText(url: string) {
-  const ab = await fetchArrayBuffer(url);
-  const enc = new TextDecoder();
-  return enc.decode(ab);
-}
-
 const moduleCache: { [name: string]: any } = Object.create(null);
 
-async function importModule(target: string) {
-  // Check whether module is a built-in.
-  switch (target) {
-    case "matplotlib":
-      return matplotlib;
-    case "test_internals":
-      return test_internals;
-  }
+function createImportModule(rpc: RPC) {
+  return async function importModule(target: string) {
+    // Check whether module is a built-in.
+    switch (target) {
+      case "matplotlib":
+        return matplotlib;
+      case "test_internals":
+        return test_internals;
+    }
 
-  // Normalize the URL, and check that it is fully-qualified, otherwise we might
-  // end up serving them the default route (index.html) from the server that
-  // hosts the notebook, which produces very confusing syntax errors.
-  try {
-    target = new URL(target).href;
-  } catch (e) {
-    throw new TypeError(`Invalid module name: '${target}'`);
-  }
+    // Normalize the URL, and check that it is fully-qualified, otherwise we might
+    // end up serving them the default route (index.html) from the server that
+    // hosts the notebook, which produces very confusing syntax errors.
+    try {
+      target = new URL(target).href;
+    } catch (e) {
+      throw new TypeError(`Invalid module name: '${target}'`);
+    }
 
-  // Check whether module is in cache.
-  if (target in moduleCache) {
-    return moduleCache[target];
-  }
+    // Check whether module is in cache.
+    if (target in moduleCache) {
+      return moduleCache[target];
+    }
 
-  // Import remote module with AMD.
-  const source = await fetchText(target);
-  let exports = {};
-  global.define = function(dependencies, factory) {
-    // TODO handle dependencies.
-    const e = factory(exports);
-    if (e) {
-      exports = e;
+    // Import remote module with AMD.
+    const source = await rpc.call("fetch", target);
+    let exports = {};
+    global.define = function(dependencies, factory) {
+      // TODO handle dependencies.
+      const e = factory(exports);
+      if (e) {
+        exports = e;
+      }
+    };
+    global.define.amd = {};
+    try {
+      globalEval(source);
+      moduleCache[target] = exports;
+      return exports;
+    } finally {
+      delete global.define;
     }
   };
-  global.define.amd = {};
-  try {
-    globalEval(source);
-    moduleCache[target] = exports;
-    return exports;
-  } finally {
-    delete global.define;
-  }
 }
 
 type CellId = number | string;
@@ -91,6 +86,7 @@ async function runCell(source: string, cellId: CellId): Promise<void> {
     const console = new Console(rpc, cellId);
     const transpiledSource = transpiler.transpile(source, `cell${cellId}`);
     const fn = globalEval(transpiledSource);
+    const importModule = createImportModule(rpc);
     const result = await fn(global, importModule, console);
     if (result !== undefined) {
       console.log(result);
