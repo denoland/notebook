@@ -40,6 +40,7 @@ import {
   query,
   getDocs,
   where,
+  serverTimestamp,
 } from "firebase/firestore";
 
 export interface Database {
@@ -95,7 +96,7 @@ class DatabaseFB implements Database {
     await updateDoc(docRef, {
       cells: document.cells,
       title: document.title || "",
-      updated: firebase.firestore.FieldValue.serverTimestamp(),
+      updated: serverTimestamp(),
     });
   }
 
@@ -113,14 +114,14 @@ class DatabaseFB implements Database {
 
     const newDoc = {
       cells: existingDoc.cells,
-      created: firebase.firestore.FieldValue.serverTimestamp(),
+      created: serverTimestamp(),
       owner: {
         displayName: u.displayName,
         photoURL: u.photoURL,
         uid: u.uid,
       },
       title: "",
-      updated: firebase.firestore.FieldValue.serverTimestamp(),
+      updated: serverTimestamp(),
     };
     console.log({ newDoc });
     const docRef = await addDoc(nbCollection, newDoc);
@@ -134,14 +135,14 @@ class DatabaseFB implements Database {
 
     const newDoc = {
       cells: [],
-      created: firebase.firestore.FieldValue.serverTimestamp(),
+      created: serverTimestamp(),
       owner: {
         displayName: u.displayName,
         photoURL: u.photoURL,
         uid: u.uid,
       },
       title: "",
-      updated: firebase.firestore.FieldValue.serverTimestamp(),
+      updated: serverTimestamp(),
     };
     console.log({ newDoc });
     const docRef = await addDoc(nbCollection, newDoc);
