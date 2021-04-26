@@ -114,15 +114,9 @@ export function route(pathname: string): Page {
 
 export const pages: Page[] = [
   {
-    title: "Propel ML",
-    path: "index.html",
-    root: Home,
-    route: /^\/(propel|index.html)?$/,
-  },
-  {
     title: "Propel Notebook",
-    path: "notebook.html",
+    path: "index.html",
     root: nb.NotebookRoot,
-    route: /^\/(propel\/notebook|notebook)/,
+    route: /^\/(notebook|index.html)/,
   },
 ];

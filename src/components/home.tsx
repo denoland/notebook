@@ -25,7 +25,7 @@ export const Home = (props) => {
         <div class="flex-cell">
           <div>
             <p>
-              Go to the <a href="/propel/notebook/">notebook</a>
+              Go to the <a href="/notebook/">notebook</a>
             </p>
           </div>
         </div>

@@ -14,7 +14,7 @@ class Tensor {
       "Tensor",
       "    [[1, 1, 1],",
       "     [1, 1, 1],",
-      "     [1, 1, 1]]"
+      "     [1, 1, 1]]",
     ].join("\n");
   }
 }
@@ -248,7 +248,7 @@ testBrowser(async function inspector_component() {
     self: null,
     string: "text",
     tensor: new Tensor(),
-    [Symbol("symbol")]: /abc/i
+    [Symbol("symbol")]: /abc/i,
   };
   val1.self = val1;
   const val2 = 42;

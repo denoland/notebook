@@ -10,16 +10,16 @@ if (IS_NODE) {
     // tslint:disable-next-line:variable-name
     const WebSocket = nodeRequire("ws");
     const server = new WebSocket.Server({ host: `127.0.0.1`, port: 0 });
-    await new Promise(res => server.once("listening", res));
+    await new Promise((res) => server.once("listening", res));
     const port = server.address().port;
     const [socket1, socket2] = await Promise.all([
-      new Promise<WebSocket>(res => {
+      new Promise<WebSocket>((res) => {
         const s = new WebSocket(`ws://127.0.0.1:${port}`);
         s.once("open", () => res(s));
       }),
-      new Promise<WebSocket>(res => {
-        server.once("connection", s => res(s as WebSocket));
-      })
+      new Promise<WebSocket>((res) => {
+        server.once("connection", (s) => res(s as WebSocket));
+      }),
     ]);
     const rpc1 = new WebSocketRPC(socket1);
     const rpc2 = new WebSocketRPC(socket2);
@@ -45,7 +45,7 @@ if (IS_NODE) {
       },
       getArray() {
         return [1, 2, 3];
-      }
+      },
     });
     rpc2.start({});
     assertEqual(await rpc2.call("getNumber"), 3.14);
@@ -66,7 +66,7 @@ if (IS_NODE) {
           val = await rpc1.call("addTwo", val);
         }
         return val;
-      }
+      },
     });
     rpc2.start({
       async addTwo(val: number) {
@@ -75,7 +75,7 @@ if (IS_NODE) {
           val = await rpc2.call("addOne", val);
         }
         return val;
-      }
+      },
     });
     assertEqual(await rpc1.call("addTwo", 0), 42);
     assertEqual(await rpc2.call("addOne", 0), 42);

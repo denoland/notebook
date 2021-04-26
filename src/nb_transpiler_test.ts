@@ -24,7 +24,7 @@ test(function nb_transpiler_transpile() {
         "(__global, __import, console) {",
       expectedBody,
       "})",
-      "//# sourceURL=__transpiled_source_1__"
+      "//# sourceURL=__transpiled_source_1__",
     ].join("\n");
 
     const transpiler = new Transpiler();

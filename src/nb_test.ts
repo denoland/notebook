@@ -204,7 +204,7 @@ function renderProfile(profileUid: string) {
   resetPage();
   const el = h(nb.NotebookRoot, {
     onReady: promise.resolve,
-    profileUid
+    profileUid,
   });
   render(el, document.body);
   return promise;
@@ -217,7 +217,7 @@ async function renderAnonNotebook(): Promise<nb.NotebookRoot> {
   const el = h(nb.NotebookRoot, {
     nbId: "default",
     onReady: promise.resolve,
-    ref: n => (notebookRoot = n)
+    ref: (n) => (notebookRoot = n),
   });
   render(el, document.body);
   await promise;
@@ -236,12 +236,12 @@ async function renderNotebook(): Promise<Notebook> {
       owner: {
         displayName: "Anonymous",
         photoURL: require("url:./img/anon_profile.png"),
-        uid: ""
+        uid: "",
       },
       title: DOC_TITLE,
-      updated: new Date()
+      updated: new Date(),
     },
-    ref: ref => (notebook = ref)
+    ref: (ref) => (notebook = ref),
   });
   render(nb, document.body);
   assert(!!notebook);

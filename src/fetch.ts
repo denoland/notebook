@@ -27,7 +27,7 @@ import {
   nodeRequire,
   process,
   randomString,
-  URL
+  URL,
 } from "./util";
 
 export const propelHostname = "propelml.org";
@@ -94,7 +94,7 @@ async function fetchBrowserXHR(job: string, url: URL): Promise<ArrayBuffer> {
   const req = new XMLHttpRequest();
   const promise = createResolvable();
   req.onload = promise.resolve;
-  req.onprogress = ev => downloadProgress(job, ev.loaded, ev.total);
+  req.onprogress = (ev) => downloadProgress(job, ev.loaded, ev.total);
   req.open("GET", url.toString(), true);
   req.responseType = "arraybuffer";
   req.send();
@@ -110,10 +110,10 @@ async function fetchNodeHTTP(job: string, url: URL): Promise<ArrayBuffer> {
   const http = nodeRequire(url.protocol === "https:" ? "https" : "http");
   const chunks: Buffer[] = [];
   const promise = createResolvable();
-  const req = http.get(url.toString(), res => {
+  const req = http.get(url.toString(), (res) => {
     const total = Number(res.headers["content-length"]);
     let loaded = 0;
-    res.on("data", chunk => {
+    res.on("data", (chunk) => {
       chunks.push(chunk);
       loaded += chunk.length;
       downloadProgress(job, loaded, total);

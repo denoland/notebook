@@ -91,8 +91,8 @@ class Placeholder {
 }
 
 // tslint:disable:variable-name
-const AsyncFunction = async function() {}.constructor;
-const GeneratorFunction = function*() {}.constructor;
+const AsyncFunction = async function () {}.constructor;
+const GeneratorFunction = function* () {}.constructor;
 const TypedArray = Object.getPrototypeOf(Int32Array);
 // tslint:enable:variable-name
 
@@ -162,7 +162,7 @@ class DescriptionBuilder {
     // If we get here, the value must be non-primitive (an object or function).
     const d: BaseObjectDescriptor = {
       ctor: null,
-      props: []
+      props: [],
     };
     const proto = Object.getPrototypeOf(value);
 
@@ -189,7 +189,7 @@ class DescriptionBuilder {
     // List named properties and symbols.
     const keys = [
       ...Object.getOwnPropertyNames(value),
-      ...Object.getOwnPropertySymbols(value)
+      ...Object.getOwnPropertySymbols(value),
     ];
     for (const key of keys) {
       const descriptor = Object.getOwnPropertyDescriptor(value, key);
@@ -228,7 +228,7 @@ class DescriptionBuilder {
         d.props.push({
           key: this.describe(key),
           value: this.describe(Placeholder[type]),
-          hidden
+          hidden,
         });
         continue;
       }
@@ -236,7 +236,7 @@ class DescriptionBuilder {
       d.props.push({
         key: this.describe(key),
         value: this.describe(descriptor.value),
-        hidden
+        hidden,
       });
     }
 
@@ -245,7 +245,7 @@ class DescriptionBuilder {
       d.props.push({
         key: this.describe("__proto__"),
         value: this.describe(proto),
-        hidden: true
+        hidden: true,
       });
     }
 
@@ -258,7 +258,7 @@ class DescriptionBuilder {
         async: value instanceof AsyncFunction,
         class: /^class\s/.test(value),
         generator: value instanceof GeneratorFunction,
-        ...d
+        ...d,
       } as FunctionDescriptor;
     } else if (
       (Array.isArray(value) || value instanceof TypedArray) &&
@@ -268,7 +268,7 @@ class DescriptionBuilder {
       return {
         type: "array",
         length: value.length,
-        ...d
+        ...d,
       } as ArrayDescriptor;
     } else if (valueIsTensor) {
       // Tensorflow.js tensor. Use toString() to format it.
@@ -277,7 +277,7 @@ class DescriptionBuilder {
         dtype: value.dtype,
         shape: [...value.shape],
         formatted: value.toString(),
-        ...d
+        ...d,
       } as TensorDescriptor;
     } else if (
       (value instanceof Boolean ||
@@ -290,7 +290,7 @@ class DescriptionBuilder {
       return {
         type: "box",
         primitive: p as PrimitiveDescriptor,
-        ...d
+        ...d,
       } as BoxDescriptor;
     } else if (value instanceof Date && succeeds(() => value.toISOString())) {
       // For practical purposes we pretend that there exist "regexp" and "date"
@@ -298,13 +298,13 @@ class DescriptionBuilder {
       return {
         type: "box",
         primitive: { type: "date", value: value.toISOString() },
-        ...d
+        ...d,
       } as BoxDescriptor;
     } else if (value instanceof RegExp && succeeds(() => String(value))) {
       return {
         type: "box",
         primitive: { type: "regexp", value: String(value) },
-        ...d
+        ...d,
       } as BoxDescriptor;
     } else {
       // Regular or other type of object.
@@ -321,9 +321,9 @@ export function describe(
   options?: InspectorOptions
 ): InspectorData {
   const builder = new DescriptionBuilder(options);
-  const roots = values.map(v => builder.describe(v));
+  const roots = values.map((v) => builder.describe(v));
   return {
     roots,
-    descriptors: builder.getDescriptors()
+    descriptors: builder.getDescriptors(),
   };
 }

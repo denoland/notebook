@@ -33,7 +33,7 @@ export const process = IS_NODE ? globalEval("process") : null;
 export const Buffer = IS_NODE ? globalEval("Buffer") : null;
 
 if (IS_NODE) {
-  process.on("unhandledRejection", error => {
+  process.on("unhandledRejection", (error) => {
     throw error;
   });
 }
@@ -130,7 +130,7 @@ export class CounterMap {
 
 // Like setTimeout but with a promise.
 export function delay(t: number): Promise<void> {
-  return new Promise(function(resolve) {
+  return new Promise(function (resolve) {
     setTimeout(resolve, t);
   });
 }
@@ -163,10 +163,7 @@ export function randomString(): string {
   // 10 characters are returned:
   //   2log(36^10)                 ~= 51.7 bits
   //   mantisssa of IEEE754 double == 52 bits
-  return (Math.random() + 1)
-    .toString(36)
-    .padEnd(12, "0")
-    .slice(2, 12);
+  return (Math.random() + 1).toString(36).padEnd(12, "0").slice(2, 12);
 }
 
 // The spec says that the maximum length of an array is UINT32_MAX, or 2**32-1.

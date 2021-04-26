@@ -228,7 +228,7 @@ export class NotebookRoot extends Component<
 
     return (
       <div class="notebook">
-        <GlobalHeader subtitle="Notebook" subtitleLink="/propel/notebook">
+        <GlobalHeader subtitle="Notebook" subtitleLink="/notebook">
           <UserMenu userInfo={this.props.userInfo} />
         </GlobalHeader>
         {body}
@@ -238,6 +238,6 @@ export class NotebookRoot extends Component<
 }
 
 function nbUrl(nbId: string): string {
-  const u = window.location.origin + "/propel/notebook?nbId=" + nbId;
+  const u = window.location.origin + "/notebook?nbId=" + nbId;
   return u;
 }

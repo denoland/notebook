@@ -24,7 +24,7 @@ import {
   onAuthStateChanged,
   Auth,
   signInWithPopup,
-  GithubAuthProvider
+  GithubAuthProvider,
 } from "firebase/auth";
 import {
   FirebaseFirestore,
@@ -39,7 +39,7 @@ import {
   limit,
   query,
   getDocs,
-  where
+  where,
 } from "firebase/firestore";
 
 export interface Database {
@@ -68,7 +68,7 @@ const firebaseConfig = {
   databaseURL: "https://propel-ml.firebaseio.com",
   messagingSenderId: "587486455356",
   projectId: "propel-ml",
-  storageBucket: "propel-ml.appspot.com"
+  storageBucket: "propel-ml.appspot.com",
 };
 
 class DatabaseFB implements Database {
@@ -95,7 +95,7 @@ class DatabaseFB implements Database {
     await updateDoc(docRef, {
       cells: document.cells,
       title: document.title || "",
-      updated: firebase.firestore.FieldValue.serverTimestamp()
+      updated: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }
 
@@ -117,10 +117,10 @@ class DatabaseFB implements Database {
       owner: {
         displayName: u.displayName,
         photoURL: u.photoURL,
-        uid: u.uid
+        uid: u.uid,
       },
       title: "",
-      updated: firebase.firestore.FieldValue.serverTimestamp()
+      updated: firebase.firestore.FieldValue.serverTimestamp(),
     };
     console.log({ newDoc });
     const docRef = await addDoc(nbCollection, newDoc);
@@ -138,10 +138,10 @@ class DatabaseFB implements Database {
       owner: {
         displayName: u.displayName,
         photoURL: u.photoURL,
-        uid: u.uid
+        uid: u.uid,
       },
       title: "",
-      updated: firebase.firestore.FieldValue.serverTimestamp()
+      updated: firebase.firestore.FieldValue.serverTimestamp(),
     };
     console.log({ newDoc });
     const docRef = await addDoc(nbCollection, newDoc);
@@ -153,7 +153,7 @@ class DatabaseFB implements Database {
     const q = query(nbCollection, orderBy("updated", "desc"), limit(100));
     const snapshots = await getDocs(q);
     const out = [];
-    snapshots.forEach(snap => {
+    snapshots.forEach((snap) => {
       const nbId = snap.id;
       const doc = snap.data();
       out.unshift({ nbId, doc });
@@ -172,7 +172,7 @@ class DatabaseFB implements Database {
 
     const snapshots = await getDocs(q);
     const out = [];
-    snapshots.forEach(snap => {
+    snapshots.forEach((snap) => {
       const nbId = snap.id;
       const doc = snap.data();
       out.push({ nbId, doc });
@@ -309,7 +309,7 @@ function lazyInit() {
 export const defaultOwner: UserInfo = Object.freeze({
   displayName: "default owner",
   photoURL: "https://avatars1.githubusercontent.com/u/80?v=4",
-  uid: "abc"
+  uid: "abc",
 });
 
 const testdataUrl = `${location.origin}/repo/src/testdata`;
@@ -319,15 +319,15 @@ const defaultDocCells: ReadonlyArray<string> = Object.freeze([
   `import * as vegalite from "${testdataUrl}/vega-lite@2.js"`,
   `import * as tf from "${testdataUrl}/tfjs@0.10.0.js"
    tf.tensor([1, 2, 3]);
-  `
+  `,
 ]);
 
 export const defaultDoc: NotebookDoc = Object.freeze({
-  cells: defaultDocCells.slice(0).map(c => c.trim()),
+  cells: defaultDocCells.slice(0).map((c) => c.trim()),
   created: new Date(),
   owner: Object.assign({}, defaultOwner),
   title: "Sample Notebook",
-  updated: new Date()
+  updated: new Date(),
 });
 
 // To bridge the old and new NotebookDoc scheme.
@@ -337,7 +337,7 @@ export function getInputCodes(doc: NotebookDoc): string[] {
   if (doc.cells != null) {
     return doc.cells;
   } else if (doc.cellDocs != null) {
-    return doc.cellDocs.map(cellDoc => cellDoc.input);
+    return doc.cellDocs.map((cellDoc) => cellDoc.input);
   } else {
     return [];
   }

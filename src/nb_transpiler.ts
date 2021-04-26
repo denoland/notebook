@@ -84,7 +84,7 @@ const importVisitors = {
   FunctionDeclaration: noop,
   FunctionExpression: noop,
   ArrowFunctionExpression: noop,
-  MethodDefinition: noop
+  MethodDefinition: noop,
 };
 
 const evalScopeVisitors = {
@@ -206,7 +206,7 @@ const evalScopeVisitors = {
   // Don't do any translation inside function (etc.) bodies.
   FunctionExpression: noop,
   ArrowFunctionExpression: noop,
-  MethodDefinition: noop
+  MethodDefinition: noop,
 };
 
 /* tslint:enable:object-literal-sort-keys*/
@@ -222,7 +222,7 @@ export class Transpiler {
     // TODO: catch SyntaxError and map to untranspiled source code.
     const root = acorn.parse(source.toString(), {
       allowImportExportEverywhere: true,
-      ecmaVersion: 8
+      ecmaVersion: 8,
     });
     const functionExpression = root.body[0].expression;
     assertEqual(functionExpression.type, "FunctionExpression");
@@ -261,7 +261,7 @@ export class Transpiler {
       {
         body,
         edit,
-        translatingVariableDeclaration: false
+        translatingVariableDeclaration: false,
       },
       evalScopeVisitors
     );
@@ -440,7 +440,7 @@ class MappedString extends Array<MappedChar> {
       return new MappedString(str);
     } else {
       return new MappedString(
-        Array.from("" + str).map(char => new MappedChar(char, pos))
+        Array.from("" + str).map((char) => new MappedChar(char, pos))
       );
     }
   }
@@ -454,14 +454,14 @@ class MappedString extends Array<MappedChar> {
       // grow as we add elements to it.
       super();
     } else if (typeof chars === "string") {
-      super(...Array.from(chars).map(char => new MappedChar(char, pos)));
+      super(...Array.from(chars).map((char) => new MappedChar(char, pos)));
     } else {
       super(...chars);
     }
   }
 
   concat(...parts: any[]): MappedString {
-    parts = parts.map(part => MappedString.convert(part));
+    parts = parts.map((part) => MappedString.convert(part));
     return Array.prototype.concat.apply(this, parts);
   }
 
@@ -487,7 +487,7 @@ class MappedString extends Array<MappedChar> {
   split(): MappedString[] {
     // This function the same as String.prototype.split(""), in other words it,
     // returns an array of MappedStrings with length 1.
-    return Array.from(this).map(c => new MappedString([c]));
+    return Array.from(this).map((c) => new MappedString([c]));
   }
 
   toString(): string {
