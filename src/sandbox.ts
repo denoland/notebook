@@ -51,7 +51,7 @@ function createImportModule(rpc: RPC) {
     // Import remote module with AMD.
     const source = await rpc.call("fetch", target);
     let exports = {};
-    global.define = function(dependencies, factory) {
+    global.define = function (dependencies, factory) {
       // TODO handle dependencies.
       const e = factory(exports);
       if (e) {
@@ -147,7 +147,7 @@ setOutputHandler({
 
   downloadProgress(data: any): void {
     rpc.call("downloadProgress", guessCellId(), data);
-  }
+  },
 });
 
 window.addEventListener("error", (ev: ErrorEvent) => {

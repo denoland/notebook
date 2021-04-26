@@ -7,8 +7,8 @@
     "node": ">=12"
   },
   "scripts": {
-    "build": "parcel build --public-url=/propel/ --log-level=info --no-source-maps --dist-dir=build src/index.html src/notebook.html src/sandbox.ts",
-    "dev": "parcel serve --dist-dir=build src/index.html src/notebook.html src/sandbox.ts",
+    "build": "parcel build --public-url=/notebook/ --log-level=info --no-source-maps --dist-dir=build src/index.html src/sandbox.ts",
+    "dev": "parcel serve --dist-dir=build src/index.html src/sandbox.ts",
     "fmt": "prettier --write src/*.ts* tools/*",
     "lint": "tslint --project tsconfig.json",
     "test": "./tools/presubmit.js"
@@ -32,7 +32,7 @@
     "parcel": "^2.0.0-beta.2",
     "parcel-plugin-markdown": "^0.3.1",
     "preact": "^8.2.7",
-    "prettier": "^1.12.1",
+    "prettier": "^2.2.1",
     "puppeteer": "^0.13.0",
     "rimraf": "^2.6.2",
     "sass": "^1.0.0-beta.5.2",

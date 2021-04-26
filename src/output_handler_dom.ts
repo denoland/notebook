@@ -24,7 +24,7 @@ import {
   InspectorData,
   OutputHandler,
   PlotData,
-  Progress
+  Progress,
 } from "./output_handler";
 
 const progressOutputHandlerMap = new Map<string, OutputHandler>();
@@ -40,7 +40,7 @@ export class OutputHandlerDOM implements OutputHandler {
     const view = new vega.View(runtime, {
       loader: vega.loader(),
       logLevel: vega.Warn,
-      renderer: "svg"
+      renderer: "svg",
     }).initialize(this.element);
     view.run();
   }
@@ -65,8 +65,8 @@ export class OutputHandlerDOM implements OutputHandler {
       data: [
         {
           name: "table",
-          values: vegaData
-        }
+          values: vegaData,
+        },
       ],
 
       scales: [
@@ -74,7 +74,7 @@ export class OutputHandlerDOM implements OutputHandler {
           name: "x",
           type: "linear",
           domain: { data: "table", field: "x" },
-          range: "width"
+          range: "width",
         },
         {
           name: "y",
@@ -82,19 +82,19 @@ export class OutputHandlerDOM implements OutputHandler {
           domain: { data: "table", field: "y" },
           range: "height",
           nice: true,
-          zero: true
+          zero: true,
         },
         {
           name: "color",
           type: "ordinal",
           domain: { data: "table", field: "c" },
-          range: "category"
-        }
+          range: "category",
+        },
       ],
 
       axes: [
         { orient: "bottom", scale: "x" },
-        { orient: "left", scale: "y" }
+        { orient: "left", scale: "y" },
       ],
 
       marks: [
@@ -104,8 +104,8 @@ export class OutputHandlerDOM implements OutputHandler {
             facet: {
               name: "series",
               data: "table",
-              groupby: "c"
-            }
+              groupby: "c",
+            },
           },
           marks: [
             {
@@ -116,13 +116,13 @@ export class OutputHandlerDOM implements OutputHandler {
                   x: { scale: "x", field: "x" },
                   y: { scale: "y", field: "y" },
                   stroke: { scale: "color", field: "c" },
-                  strokeWidth: { value: 2 }
-                }
-              }
-            }
-          ]
-        }
-      ]
+                  strokeWidth: { value: 2 },
+                },
+              },
+            },
+          ],
+        },
+      ],
     });
   }
 

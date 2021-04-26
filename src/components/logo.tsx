@@ -45,7 +45,7 @@ export function PropelLogo(props: PropelLogoProps): JSX.Element {
       <div class="global-title">
         <div class="global-main-title">
           <h1>
-            <a href="/">Propel</a>
+            <a href="/notebook">Propel</a>
           </h1>
         </div>
         <div class="global-sub-title">{Subtitle}</div>

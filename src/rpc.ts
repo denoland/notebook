@@ -86,7 +86,7 @@ export abstract class RPCBase implements RPC {
       type: "call",
       id,
       handler,
-      args
+      args,
     };
 
     const resolver = createResolvable<any>();
@@ -127,7 +127,7 @@ export abstract class RPCBase implements RPC {
     const { id, handler, args } = message;
     const ret: ReturnMessage = {
       type: "return",
-      id
+      id,
     };
     try {
       const result = await this.handlers[handler](...args);
@@ -150,7 +150,7 @@ export abstract class RPCBase implements RPC {
       if (exception.__error__) {
         // Convert to Error object.
         exception = Object.assign(new Error(exception.message), {
-          stack: exception.stack
+          stack: exception.stack,
         });
       }
       resolver.reject(exception);
