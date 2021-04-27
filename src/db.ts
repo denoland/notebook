@@ -64,12 +64,12 @@ let db: FirebaseFirestore;
 let nbCollection: CollectionReference;
 let auth: Auth;
 const firebaseConfig = {
-  apiKey: "AIzaSyAc5XVKd27iXdGf1ZEFLWudZbpFg3nAwjQ",
-  authDomain: "propel-ml.firebaseapp.com",
-  databaseURL: "https://propel-ml.firebaseio.com",
-  messagingSenderId: "587486455356",
-  projectId: "propel-ml",
-  storageBucket: "propel-ml.appspot.com",
+  apiKey: "AIzaSyCl0QzxMZaerVvUl31wp2eg8Lt4Nv-IVDI",
+  authDomain: "deno-notebook.firebaseapp.com",
+  projectId: "deno-notebook",
+  storageBucket: "deno-notebook.appspot.com",
+  messagingSenderId: "613883497521",
+  appId: "1:613883497521:web:07c13ba44b5f439ac2d910"
 };
 
 class DatabaseFB implements Database {
