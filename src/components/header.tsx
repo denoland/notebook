@@ -14,17 +14,13 @@
  */
 
 import { h } from "preact";
-import { PropelLogo } from "./logo";
 
 export function GlobalHeader(props): JSX.Element {
   return (
     <header>
       <div class="global-header">
         <div class="global-header-inner">
-          <PropelLogo
-            subtitle={props.subtitle}
-            subtitleLink={props.subtitleLink}
-          />
+          <h2>Deno</h2>
           <div class="global-header-right">{props.children}</div>
         </div>
       </div>

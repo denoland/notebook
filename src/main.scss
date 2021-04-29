@@ -604,7 +604,8 @@ header {
     max-width: 960px;
     flex-direction: row;
     justify-content: space-between;
-    height: 64px;
+    align-items: center;
+    height: 48px;
     margin: 0 auto;
   }
 }
