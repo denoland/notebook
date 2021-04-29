@@ -25,6 +25,7 @@ import {
   Auth,
   signInWithPopup,
   GithubAuthProvider,
+  signOut,
 } from "firebase/auth";
 import {
   FirebaseFirestore,
@@ -50,7 +51,7 @@ export interface Database {
   create(): Promise<string>;
   queryProfile(uid: string, limit: number): Promise<NbInfo[]>;
   queryLatest(): Promise<NbInfo[]>;
-  signIn(): Promise<void>;
+  signIn(): void;
   signOut(): void;
   subscribeAuthChange(cb: (user: UserInfo) => void): UnsubscribeCb;
 }
@@ -69,7 +70,7 @@ const firebaseConfig = {
   projectId: "deno-notebook",
   storageBucket: "deno-notebook.appspot.com",
   messagingSenderId: "613883497521",
-  appId: "1:613883497521:web:07c13ba44b5f439ac2d910"
+  appId: "1:613883497521:web:07c13ba44b5f439ac2d910",
 };
 
 class DatabaseFB implements Database {
@@ -181,15 +182,15 @@ class DatabaseFB implements Database {
     return out.reverse();
   }
 
-  async signIn() {
+  signIn() {
     lazyInit();
     const provider = new GithubAuthProvider();
-    await signInWithPopup(auth, provider);
+    signInWithPopup(auth, provider);
   }
 
   signOut() {
     lazyInit();
-    auth.signOut();
+    signOut(auth);
   }
 
   subscribeAuthChange(cb: (user: UserInfo) => void): UnsubscribeCb {
@@ -252,7 +253,7 @@ export class DatabaseMock implements Database {
     return [];
   }
 
-  async signIn() {
+  signIn() {
     this.inc("signIn");
     this.currentUser = defaultOwner;
     this.makeAuthChangeCallbacks();
